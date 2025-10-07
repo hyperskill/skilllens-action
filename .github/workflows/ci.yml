@@ -57,8 +57,11 @@ jobs:
         id: test-action
         uses: ./
         with:
-          milliseconds: 2000
+          skilllens-api-url: 'https://example.com/api/v1/recommendations'
+          fail-on-proxy-error: 'false'
 
       - name: Print Output
         id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+        run: |
+          echo "Topics: ${{ steps.test-action.outputs.topics-json }}"
+          echo "Comment URL: ${{ steps.test-action.outputs.comment-url }}"
