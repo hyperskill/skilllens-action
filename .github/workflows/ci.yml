@@ -48,6 +48,12 @@ jobs:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+
     steps:
       - name: Checkout
         id: checkout
@@ -59,6 +65,8 @@ jobs:
         with:
           skilllens-api-url: 'https://example.com/api/v1/recommendations'
           fail-on-proxy-error: 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Print Output
         id: output
