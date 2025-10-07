@@ -1,24 +1,50 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: 'SkillLens — PR Review → Hyperskill'
+description:
+  'Parses PR review feedback and posts learning recommendations from Hyperskill.'
+author: 'Hyperskill / SkillLens'
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
+  icon: 'book-open'
+  color: 'purple'
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  skilllens-api-url:
+    description:
+      'SkillLens Proxy endpoint (e.g.,
+      https://<your-backend>/v1/recommendations)'
     required: true
-    default: '1000'
+  oidc-audience:
+    description:
+      'OIDC audience to request for ID token (matches backend expected "aud")'
+    required: false
+    default: 'skilllens.dev'
+  default-language:
+    description: 'Fallback programming language for topics (e.g., Python)'
+    required: false
+    default: 'Python'
+  max-topics:
+    description: 'Maximum number of topics to include'
+    required: false
+    default: '5'
+  min-confidence:
+    description: 'Minimum confidence threshold (0..1) for topics'
+    required: false
+    default: '0.65'
+  comment-marker:
+    description: 'Hidden marker used to upsert a single PR comment'
+    required: false
+    default: '<!-- SkillLens:v0 -->'
+  fail-on-proxy-error:
+    description: 'Fail the workflow if the proxy returns an error (true/false)'
+    required: false
+    default: 'false'
 
-# Define your outputs here.
 outputs:
-  time:
-    description: Your output description here
+  topics-json:
+    description: 'JSON string of returned topics (for debugging/CI artifacts)'
+  comment-url:
+    description: 'URL of the created/updated PR comment'
 
 runs:
-  using: node24
+  using: node20
   main: dist/index.js

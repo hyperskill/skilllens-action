@@ -1,27 +1,213 @@
 import * as core from '@actions/core'
-import { wait } from './wait.js'
+import * as github from '@actions/github'
 
-/**
- * The main function for the action.
- *
- * @returns Resolves when the action is complete.
- */
+export type ReviewItem = {
+  type: 'inline' | 'review' | 'conversation'
+  body: string
+  path?: string
+  author?: string
+  created_at: string
+}
+
+export function redactCodeFences(body: string, max = 200): string {
+  return body.replace(/```([\s\S]*?)```/g, (_m, p1) => {
+    const s = String(p1)
+    return '```' + (s.length > max ? s.slice(0, max) + '…' : s) + '```'
+  })
+}
+
+export function isNoisy(body: string): boolean {
+  const trimmed = body.trim().toLowerCase()
+  if (trimmed.length === 0) return true
+  if (trimmed.length <= 5 && /^[👍👎✅❌🎉💯lgtm]+$/u.test(trimmed)) return true
+  return false
+}
+
+export async function listData(
+  octokit: ReturnType<typeof github.getOctokit>,
+  owner: string,
+  repo: string,
+  pr: number
+): Promise<ReviewItem[]> {
+  const [inline, reviews, convo] = await Promise.all([
+    octokit.rest.pulls.listReviewComments({
+      owner,
+      repo,
+      pull_number: pr,
+      per_page: 100
+    }),
+    octokit.rest.pulls.listReviews({
+      owner,
+      repo,
+      pull_number: pr,
+      per_page: 100
+    }),
+    octokit.rest.issues.listComments({
+      owner,
+      repo,
+      issue_number: pr,
+      per_page: 100
+    })
+  ])
+
+  const items: ReviewItem[] = []
+
+  for (const comment of inline.data) {
+    if (comment.body && !isNoisy(comment.body)) {
+      items.push({
+        type: 'inline',
+        body: redactCodeFences(comment.body),
+        path: comment.path,
+        author: comment.user?.login,
+        created_at: comment.created_at
+      })
+    }
+  }
+
+  for (const review of reviews.data) {
+    if (review.body && !isNoisy(review.body)) {
+      items.push({
+        type: 'review',
+        body: redactCodeFences(review.body),
+        author: review.user?.login,
+        created_at: review.submitted_at || ''
+      })
+    }
+  }
+
+  for (const comment of convo.data) {
+    if (comment.body && !isNoisy(comment.body)) {
+      items.push({
+        type: 'conversation',
+        body: redactCodeFences(comment.body),
+        author: comment.user?.login,
+        created_at: comment.created_at
+      })
+    }
+  }
+
+  return items
+}
+
+export async function upsertComment(
+  octokit: ReturnType<typeof github.getOctokit>,
+  owner: string,
+  repo: string,
+  pr: number,
+  marker: string,
+  markdown: string
+): Promise<string> {
+  const existing = await octokit.rest.issues.listComments({
+    owner,
+    repo,
+    issue_number: pr,
+    per_page: 100
+  })
+  const found = existing.data.find((c) => c.body?.includes(marker))
+
+  const fullBody = `${marker}\n\n${markdown}`
+
+  if (found) {
+    await octokit.rest.issues.updateComment({
+      owner,
+      repo,
+      comment_id: found.id,
+      body: fullBody
+    })
+    return found.html_url
+  } else {
+    const created = await octokit.rest.issues.createComment({
+      owner,
+      repo,
+      issue_number: pr,
+      body: fullBody
+    })
+    return created.data.html_url
+  }
+}
+
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const { owner, repo } = github.context.repo
+    const pr =
+      github.context.payload.pull_request?.number ??
+      github.context.payload.issue?.number
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    if (!pr) {
+      core.info('No PR number found in context; exiting.')
+      return
+    }
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const token = process.env.GITHUB_TOKEN || core.getInput('github-token')
+    if (!token) {
+      core.setFailed('GITHUB_TOKEN is required')
+      return
+    }
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    const octokit = github.getOctokit(token)
+
+    const items = await listData(octokit, owner, repo, pr)
+    if (items.length === 0) {
+      core.info('No review content to analyze; exiting.')
+      return
+    }
+
+    const apiUrl = core.getInput('skilllens-api-url', { required: true })
+    const audience = core.getInput('oidc-audience') || 'skilllens.dev'
+    const idToken = await core.getIDToken(audience)
+
+    const defaults = {
+      language: core.getInput('default-language') || 'Python',
+      maxTopics: Number(core.getInput('max-topics') || '5'),
+      minConfidence: Number(core.getInput('min-confidence') || '0.65')
+    }
+
+    const resp = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`
+      },
+      body: JSON.stringify({
+        repo: { owner, name: repo, prNumber: pr },
+        reviews: items,
+        defaults
+      })
+    })
+
+    if (!resp.ok) {
+      const fail = core.getInput('fail-on-proxy-error') === 'true'
+      const msg = `Proxy error ${resp.status}: ${await resp.text()}`
+      if (fail) {
+        core.setFailed(msg)
+        return
+      }
+      core.warning(msg)
+      return
+    }
+
+    const data = (await resp.json()) as {
+      topics: unknown[]
+      commentMarkdown: string
+    }
+
+    if (!data.commentMarkdown) {
+      core.info('Proxy returned no commentMarkdown; nothing to post.')
+      return
+    }
+
+    const url = await upsertComment(
+      octokit,
+      owner,
+      repo,
+      pr,
+      core.getInput('comment-marker') || '<!-- SkillLens:v0 -->',
+      data.commentMarkdown
+    )
+
+    core.setOutput('topics-json', JSON.stringify(data.topics ?? []))
+    core.setOutput('comment-url', url)
+  } catch (err) {
+    core.setFailed(err instanceof Error ? err.message : String(err))
   }
 }
