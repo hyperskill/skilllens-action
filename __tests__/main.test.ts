@@ -21,7 +21,6 @@ describe('main.ts', () => {
 
     core.getInput.mockImplementation((name: string) => {
       const inputs: Record<string, string> = {
-        'skilllens-api-url': 'https://api.test.com/v1/recommendations',
         'oidc-audience': 'skilllens.dev',
         'default-language': 'Python',
         'max-topics': '5',
@@ -292,7 +291,7 @@ describe('main.ts', () => {
       await run()
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.test.com/v1/recommendations',
+        'https://api.skilllens.dev/v1/recommendations',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -330,8 +329,6 @@ describe('main.ts', () => {
     it('Fails workflow when proxy error and fail-on-proxy-error is true', async () => {
       core.getInput.mockImplementation((name: string) => {
         if (name === 'fail-on-proxy-error') return 'true'
-        if (name === 'skilllens-api-url')
-          return 'https://api.test.com/v1/recommendations'
         return ''
       })
 

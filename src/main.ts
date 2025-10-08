@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
+const SKILLLENS_API_URL = 'https://api.skilllens.dev/v1/recommendations'
+
 let debugEnabled = false
 
 function debug(message: string): void {
@@ -193,7 +195,6 @@ export async function run(): Promise<void> {
       return
     }
 
-    const apiUrl = core.getInput('skilllens-api-url', { required: true })
     const audience = core.getInput('oidc-audience') || 'skilllens.dev'
     const idToken = await core.getIDToken(audience)
 
@@ -203,14 +204,13 @@ export async function run(): Promise<void> {
       minConfidence: Number(core.getInput('min-confidence') || '0.65')
     }
 
-    debug(`API URL: ${apiUrl}`)
     debug(`OIDC Audience: ${audience}`)
     debug(
       `Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`
     )
 
     debug(`Calling SkillLens API with ${items.length} review item(s)`)
-    const resp = await fetch(apiUrl, {
+    const resp = await fetch(SKILLLENS_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

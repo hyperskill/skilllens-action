@@ -72,9 +72,6 @@ branding:
 
 ```yaml
 inputs:
-  skilllens-api-url:
-    description: "SkillLens Proxy endpoint (e.g., https://<your-backend>/v1/recommendations)"
-    required: true
   oidc-audience:
     description: "OIDC audience to request for ID token (matches backend expected 'aud')"
     required: false
@@ -143,7 +140,6 @@ jobs:
     steps:
       - uses: <you>/skilllens-action@v1
         with:
-          skilllens-api-url: https://<your-backend>/v1/recommendations
           oidc-audience: skilllens.dev
           default-language: Python
           max-topics: 5
@@ -184,7 +180,7 @@ Using Octokit with the job’s `GITHUB_TOKEN`:
 
 ### 6.5 Call Proxy
 
-* POST `${skilllens-api-url}` with JSON body:
+* POST `https://api.skilllens.dev/v1/recommendations` with JSON body:
 
   ```json
   {
@@ -279,7 +275,6 @@ async function run() {
       return;
     }
 
-    const apiUrl = core.getInput('skilllens-api-url', { required: true });
     const audience = core.getInput('oidc-audience') || 'skilllens.dev';
     const idToken = await core.getIDToken(audience);
 
@@ -289,7 +284,7 @@ async function run() {
       minConfidence: Number(core.getInput('min-confidence') || '0.65')
     };
 
-    const resp = await fetch(apiUrl, {
+    const resp = await fetch('https://api.skilllens.dev/v1/recommendations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
       body: JSON.stringify({ repo: { owner, name: repo, prNumber: pr }, reviews: items, defaults })

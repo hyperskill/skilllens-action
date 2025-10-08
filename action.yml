@@ -8,11 +8,6 @@ branding:
   color: 'purple'
 
 inputs:
-  skilllens-api-url:
-    description:
-      'SkillLens Proxy endpoint (e.g.,
-      https://<your-backend>/v1/recommendations)'
-    required: true
   oidc-audience:
     description:
       'OIDC audience to request for ID token (matches backend expected "aud")'

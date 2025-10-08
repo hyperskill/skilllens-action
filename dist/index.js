@@ -31241,6 +31241,7 @@ function requireGithub () {
 
 var githubExports = requireGithub();
 
+const SKILLLENS_API_URL = 'https://api.skilllens.dev/v1/recommendations';
 let debugEnabled = false;
 function debug(message) {
     if (debugEnabled) {
@@ -31390,7 +31391,6 @@ async function run() {
             coreExports.info('No review content to analyze; exiting.');
             return;
         }
-        const apiUrl = coreExports.getInput('skilllens-api-url', { required: true });
         const audience = coreExports.getInput('oidc-audience') || 'skilllens.dev';
         const idToken = await coreExports.getIDToken(audience);
         const defaults = {
@@ -31398,11 +31398,10 @@ async function run() {
             maxTopics: Number(coreExports.getInput('max-topics') || '5'),
             minConfidence: Number(coreExports.getInput('min-confidence') || '0.65')
         };
-        debug(`API URL: ${apiUrl}`);
         debug(`OIDC Audience: ${audience}`);
         debug(`Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`);
         debug(`Calling SkillLens API with ${items.length} review item(s)`);
-        const resp = await fetch(apiUrl, {
+        const resp = await fetch(SKILLLENS_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
