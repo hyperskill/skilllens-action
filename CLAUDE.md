@@ -136,8 +136,8 @@ Action consumers must grant these permissions in their workflow:
 ```yaml
 permissions:
   contents: read          # Read repo metadata
-  pull-requests: write    # Create/update PR comments
-  issues: write           # PR comments use Issues API
+  pull-requests: read     # Read PR reviews and comments
+  issues: write           # Create/update PR comments (PRs use Issues API)
   id-token: write         # Request OIDC token
 ```
 

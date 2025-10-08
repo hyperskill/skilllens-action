@@ -129,7 +129,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
   issues: write
   id-token: write
 
@@ -340,13 +340,13 @@ run();
   ```yaml
   permissions:
     contents: read
-    pull-requests: write
+    pull-requests: read
     issues: write
     id-token: write
   ```
 
   * `GITHUB_TOKEN` is recommended for GitHub API calls from workflows; permissions are scoped via `permissions:`. ([GitHub Docs][1])
-  * OIDC is requested via `core.getIDToken(aud)`, per GitHub’s OIDC docs. ([GitHub Docs][5])
+  * OIDC is requested via `core.getIDToken(aud)`, per GitHub's OIDC docs. ([GitHub Docs][5])
 
 * **Data policy** in README:
 
