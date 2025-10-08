@@ -65,6 +65,12 @@ permissions:
   issues: write
   id-token: write
 
+concurrency:
+  group:
+    skilllens-${{ github.event.pull_request.number || github.event.issue.number
+    }}
+  cancel-in-progress: true
+
 jobs:
   skilllens:
     if:
@@ -73,6 +79,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: hyperskill/skilllens-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 **That's it!** 🎉 The action will now automatically post learning
@@ -148,18 +156,24 @@ optimization in Python applications
 ```yaml
 # Python Projects
 - uses: hyperskill/skilllens-action@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   with:
     default-language: Python
     max-topics: 5
 
 # JavaScript/TypeScript Projects
 - uses: hyperskill/skilllens-action@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   with:
     default-language: JavaScript
     min-confidence: 0.7
 
 # Java Projects
 - uses: hyperskill/skilllens-action@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   with:
     default-language: Java
     fail-on-proxy-error: true
@@ -171,6 +185,8 @@ optimization in Python applications
 - name: Generate Recommendations
   id: skilllens
   uses: hyperskill/skilllens-action@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 - name: Save Topics
   run: echo "${{ steps.skilllens.outputs.topics-json }}" > topics.json

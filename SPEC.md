@@ -133,12 +133,18 @@ permissions:
   issues: write
   id-token: write
 
+concurrency:
+  group: skilllens-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   skilllens:
     if: ${{ github.event_name != 'issue_comment' || github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
       - uses: <you>/skilllens-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           oidc-audience: skilllens.dev
           default-language: Python
