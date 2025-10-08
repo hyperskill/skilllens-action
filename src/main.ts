@@ -84,7 +84,7 @@ export async function listData(
         type: 'review',
         body: review.body,
         author: review.user?.login,
-        created_at: review.submitted_at || ''
+        created_at: review.submitted_at ?? ''
       })
     }
   }

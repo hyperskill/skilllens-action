@@ -31301,7 +31301,7 @@ async function listData(octokit, owner, repo, pr) {
                 type: 'review',
                 body: review.body,
                 author: review.user?.login,
-                created_at: review.submitted_at || ''
+                created_at: review.submitted_at ?? ''
             });
         }
     }
