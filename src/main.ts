@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 
 const SKILLLENS_API_URL =
-  'https://skill-lens-replit2142.replit.app/v1/recommendations'
+  'https://skilllens-25qt.onrender.com/v1/recommendations'
 
 let debugEnabled = false
 
