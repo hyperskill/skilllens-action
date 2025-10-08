@@ -195,13 +195,13 @@ export async function run(): Promise<void> {
       return
     }
 
-    const audience = core.getInput('oidc-audience') || 'skilllens.dev'
+    const audience = core.getInput('oidc-audience')
     const idToken = await core.getIDToken(audience)
 
     const defaults = {
-      language: core.getInput('default-language') || 'Python',
-      maxTopics: Number(core.getInput('max-topics') || '5'),
-      minConfidence: Number(core.getInput('min-confidence') || '0.65')
+      language: core.getInput('default-language'),
+      maxTopics: Number(core.getInput('max-topics')),
+      minConfidence: Number(core.getInput('min-confidence'))
     }
 
     debug(`OIDC Audience: ${audience}`)
@@ -249,7 +249,7 @@ export async function run(): Promise<void> {
       return
     }
 
-    const marker = core.getInput('comment-marker') || '<!-- SkillLens:v0 -->'
+    const marker = core.getInput('comment-marker')
     debug(`Upserting comment with marker: ${marker}`)
 
     const url = await upsertComment(
@@ -263,6 +263,7 @@ export async function run(): Promise<void> {
 
     core.setOutput('topics-json', JSON.stringify(data.topics ?? []))
     core.setOutput('comment-url', url)
+
     debug('Action completed successfully')
   } catch (err) {
     core.setFailed(err instanceof Error ? err.message : String(err))

@@ -31391,12 +31391,12 @@ async function run() {
             coreExports.info('No review content to analyze; exiting.');
             return;
         }
-        const audience = coreExports.getInput('oidc-audience') || 'skilllens.dev';
+        const audience = coreExports.getInput('oidc-audience');
         const idToken = await coreExports.getIDToken(audience);
         const defaults = {
-            language: coreExports.getInput('default-language') || 'Python',
-            maxTopics: Number(coreExports.getInput('max-topics') || '5'),
-            minConfidence: Number(coreExports.getInput('min-confidence') || '0.65')
+            language: coreExports.getInput('default-language'),
+            maxTopics: Number(coreExports.getInput('max-topics')),
+            minConfidence: Number(coreExports.getInput('min-confidence'))
         };
         debug(`OIDC Audience: ${audience}`);
         debug(`Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`);
@@ -31432,7 +31432,7 @@ async function run() {
             coreExports.info('Proxy returned no commentMarkdown; nothing to post.');
             return;
         }
-        const marker = coreExports.getInput('comment-marker') || '<!-- SkillLens:v0 -->';
+        const marker = coreExports.getInput('comment-marker');
         debug(`Upserting comment with marker: ${marker}`);
         const url = await upsertComment(octokit, owner, repo, pr, marker, data.commentMarkdown);
         coreExports.setOutput('topics-json', JSON.stringify(data.topics ?? []));
