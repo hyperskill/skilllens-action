@@ -1,305 +1,441 @@
-# Create a GitHub Action Using TypeScript
+# 📚 SkillLens: Transform PR Feedback into Developer Growth
 
-[![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
-[![Check dist/](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml)
-[![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
+[![CI](https://github.com/hyperskill/skilllens-action/actions/workflows/ci.yml/badge.svg)](https://github.com/hyperskill/skilllens-action/actions/workflows/ci.yml)
+[![Check dist/](https://github.com/hyperskill/skilllens-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/hyperskill/skilllens-action/actions/workflows/check-dist.yml)
+[![CodeQL](https://github.com/hyperskill/skilllens-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hyperskill/skilllens-action/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-Use this template to bootstrap the creation of a TypeScript action. :rocket:
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-SkillLens-blue.svg?colorA=24292e&colorB=0366d6&style=flat-square&logo=github)](https://github.com/marketplace/actions/skilllens-pr-review-learning-developer-growth)
+[![Powered by Hyperskill](https://img.shields.io/badge/Powered%20by-Hyperskill-purple?style=flat-square)](https://hyperskill.org)
+[![Privacy: No Code Access](https://img.shields.io/badge/Privacy-No%20Code%20Access-success?style=flat-square)](#-privacy--security)
+[![Setup: Zero Config](https://img.shields.io/badge/Setup-Zero%20Config-brightgreen?style=flat-square)](#-quick-start)
 
-This template includes compilation support, tests, a validation workflow,
-publishing, and versioning guidance.
+> **Turn every code review into a learning opportunity.** SkillLens
+> automatically analyzes PR review feedback and suggests relevant learning
+> resources from Hyperskill — no configuration, no API keys, just actionable
+> education when you need it most.
 
-If you are new, there's also a simpler introduction in the
-[Hello world JavaScript action repository](https://github.com/actions/hello-world-javascript-action).
+```mermaid
+graph LR
+    A[PR Review<br/>Comments] -->|Analyze| B[SkillLens]
+    B -->|AI-Powered<br/>Topic Extraction| C[Learning Topics]
+    C -->|Match with<br/>Hyperskill| D[Curated<br/>Resources]
+    D -->|Post as<br/>Comment| E[📚 Learning<br/>Recommendations]
 
-## Create Your Own Action
+    style B fill:#7B68EE,stroke:#5a4abf,stroke-width:3px,color:#fff
+    style E fill:#90EE90,stroke:#228B22,stroke-width:2px
+```
 
-To create your own action, you can use this repository as a template! Just
-follow the below instructions:
+## ✨ Why SkillLens?
 
-1. Click the **Use this template** button at the top of the repository
-1. Select **Create a new repository**
-1. Select an owner and name for your new repository
-1. Click **Create repository**
-1. Clone your new repository
+- ✅ **Zero Configuration** — Works out of the box with your existing GitHub
+  workflow
+- 🔒 **Privacy-First** — Only reads review comments, never your source code
+- 🎯 **AI-Powered Intelligence** — Contextual understanding, not keyword
+  matching
+- 📚 **Curated Learning Paths** — Direct links to relevant Hyperskill courses
+  and topics
+- 🤖 **Non-Intrusive** — Single, auto-updating comment per PR (no notification
+  spam)
+- ⚡ **Lightning Fast** — Typical execution under 10 seconds
 
-> [!IMPORTANT]
->
-> Make sure to remove or update the [`CODEOWNERS`](./CODEOWNERS) file! For
-> details on how to use this file, see
-> [About code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
+Perfect for teams building a **culture of continuous learning**, open-source
+projects supporting **contributor growth**, and developers seeking
+**personalized skill development**.
 
-## Initial Setup
+## 🚀 Quick Start
 
-After you've cloned the repository to your local machine or codespace, you'll
-need to perform some initial setup steps before you can develop your action.
-
-> [!NOTE]
->
-> You'll need to have a reasonably modern version of
-> [Node.js](https://nodejs.org) handy (20.x or later should work!). If you are
-> using a version manager like [`nodenv`](https://github.com/nodenv/nodenv) or
-> [`fnm`](https://github.com/Schniz/fnm), this template has a `.node-version`
-> file at the root of the repository that can be used to automatically switch to
-> the correct version when you `cd` into the repository. Additionally, this
-> `.node-version` file is used by GitHub Actions in any `actions/setup-node`
-> actions.
-
-1. :hammer_and_wrench: Install the dependencies
-
-   ```bash
-   npm install
-   ```
-
-1. :building_construction: Package the TypeScript for distribution
-
-   ```bash
-   npm run bundle
-   ```
-
-1. :white_check_mark: Run the tests
-
-   ```bash
-   $ npm test
-
-   PASS  ./index.test.js
-     ✓ throws invalid number (3ms)
-     ✓ wait 500 ms (504ms)
-     ✓ test runs (95ms)
-
-   ...
-   ```
-
-## Update the Action Metadata
-
-The [`action.yml`](action.yml) file defines metadata about your action, such as
-input(s) and output(s). For details about this file, see
-[Metadata syntax for GitHub Actions](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions).
-
-When you copy this repository, update `action.yml` with the name, description,
-inputs, and outputs for your action.
-
-## Update the Action Code
-
-The [`src/`](./src/) directory is the heart of your action! This contains the
-source code that will be run when your action is invoked. You can replace the
-contents of this directory with your own code.
-
-There are a few things to keep in mind when writing your action code:
-
-- Most GitHub Actions toolkit and CI/CD operations are processed asynchronously.
-  In `main.ts`, you will see that the action is run in an `async` function.
-
-  ```javascript
-  import * as core from '@actions/core'
-  //...
-
-  async function run() {
-    try {
-      //...
-    } catch (error) {
-      core.setFailed(error.message)
-    }
-  }
-  ```
-
-  For more information about the GitHub Actions toolkit, see the
-  [documentation](https://github.com/actions/toolkit/blob/main/README.md).
-
-So, what are you waiting for? Go ahead and start customizing your action!
-
-1. Create a new branch
-
-   ```bash
-   git checkout -b releases/v1
-   ```
-
-1. Replace the contents of `src/` with your action code
-1. Add tests to `__tests__/` for your source code
-1. Format, test, and build the action
-
-   ```bash
-   npm run all
-   ```
-
-   > This step is important! It will run [`rollup`](https://rollupjs.org/) to
-   > build the final JavaScript action code with all dependencies included. If
-   > you do not run this step, your action will not work correctly when it is
-   > used in a workflow.
-
-1. (Optional) Test your action locally
-
-   The [`@github/local-action`](https://github.com/github/local-action) utility
-   can be used to test your action locally. It is a simple command-line tool
-   that "stubs" (or simulates) the GitHub Actions Toolkit. This way, you can run
-   your TypeScript action locally without having to commit and push your changes
-   to a repository.
-
-   The `local-action` utility can be run in the following ways:
-   - Visual Studio Code Debugger
-
-     Make sure to review and, if needed, update
-     [`.vscode/launch.json`](./.vscode/launch.json)
-
-   - Terminal/Command Prompt
-
-     ```bash
-     # npx @github/local action <action-yaml-path> <entrypoint> <dotenv-file>
-     npx @github/local-action . src/main.ts .env
-     ```
-
-   You can provide a `.env` file to the `local-action` CLI to set environment
-   variables used by the GitHub Actions Toolkit. For example, setting inputs and
-   event payload data used by your action. For more information, see the example
-   file, [`.env.example`](./.env.example), and the
-   [GitHub Actions Documentation](https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables).
-
-1. Commit your changes
-
-   ```bash
-   git add .
-   git commit -m "My first action is ready!"
-   ```
-
-1. Push them to your repository
-
-   ```bash
-   git push -u origin releases/v1
-   ```
-
-1. Create a pull request and get feedback on your action
-1. Merge the pull request into the `main` branch
-
-Your action is now published! :rocket:
-
-For information about versioning your action, see
-[Versioning](https://github.com/actions/toolkit/blob/main/docs/action-versioning.md)
-in the GitHub Actions toolkit.
-
-## Validate the Action
-
-You can now validate the action by referencing it in a workflow file. For
-example, [`ci.yml`](./.github/workflows/ci.yml) demonstrates how to reference an
-action in the same repository.
+Add this workflow to `.github/workflows/skilllens.yml` in your repository:
 
 ```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v4
+name: SkillLens Learning Recommendations
 
-  - name: Test Local Action
-    id: test-action
-    uses: ./
-    with:
-      milliseconds: 1000
+on:
+  pull_request_review:
+    types: [submitted, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+  issue_comment:
+    types: [created, edited]
 
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+  id-token: write
+
+jobs:
+  skilllens:
+    if:
+      ${{ github.event_name != 'issue_comment' ||
+      github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hyperskill/skilllens-action@v1
 ```
 
-For example workflow runs, check out the
-[Actions tab](https://github.com/actions/typescript-action/actions)! :rocket:
+**That's it!** 🎉 The action will now automatically post learning
+recommendations when reviewers provide feedback.
 
-## Usage
+## 📖 How It Works
 
-After testing, you can create version tag(s) that developers can use to
-reference different stable versions of your action. For more information, see
-[Versioning](https://github.com/actions/toolkit/blob/main/docs/action-versioning.md)
-in the GitHub Actions toolkit.
+1. **Monitors** PR reviews, inline comments, and conversation threads
+1. **Filters** noise (LGTM, emojis) to focus on substantive feedback
+1. **Analyzes** comments using AI to identify learning opportunities
+1. **Matches** topics with Hyperskill's comprehensive course catalog
+1. **Posts** a single, updateable comment with personalized recommendations
 
-To include the action in a workflow in another repository, you can use the
-`uses` syntax with the `@` symbol to reference a specific branch, tag, or commit
-hash.
+<details>
+<summary><b>See an Example Output</b></summary>
+
+When a reviewer comments:
+
+> "Consider using list comprehension instead of a for loop here"
+
+SkillLens posts:
+
+---
+
+<!-- SkillLens:v0 -->
+
+### 📚 Learning Recommendations from Hyperskill
+
+Based on recent review feedback, here are personalized learning resources:
+
+**1. Python Collections & List Comprehensions** _(Confidence: 92%)_ Learn
+efficient list operations and Pythonic patterns
+[📖 View Course →](https://hyperskill.org/topics/list-comprehensions) ·
+[🎯 Practice Problems →](https://hyperskill.org/practice)
+
+**2. Code Optimization Techniques** _(Confidence: 87%)_ Master performance
+optimization in Python applications
+[📖 View Course →](https://hyperskill.org/topics/optimization) ·
+[📚 Learning Track →](https://hyperskill.org/tracks/python-core)
+
+---
+
+<sub>🤖 Generated from review comments only • No source code analyzed •
+[Learn more](https://github.com/hyperskill/skilllens-action)</sub>
+
+</details>
+
+## ⚙️ Configuration
+
+### Inputs
+
+| Input                 | Description                                        | Required | Default         | Example              |
+| --------------------- | -------------------------------------------------- | -------- | --------------- | -------------------- |
+| `oidc-audience`       | OIDC audience for backend authentication           | No       | `skilllens.dev` | `custom.domain.com`  |
+| `default-language`    | Fallback language when repository language unknown | No       | `Python`        | `JavaScript`, `Java` |
+| `max-topics`          | Maximum learning topics to include                 | No       | `5`             | `3`, `10`            |
+| `min-confidence`      | Minimum confidence threshold (0-1)                 | No       | `0.65`          | `0.5`, `0.8`         |
+| `fail-on-proxy-error` | Fail workflow on backend errors                    | No       | `false`         | `true`               |
+| `enable-debug`        | Enable detailed debug logging                      | No       | `false`         | `true`               |
+
+### Outputs
+
+| Output        | Description                              | Example Use                |
+| ------------- | ---------------------------------------- | -------------------------- |
+| `topics-json` | JSON array of identified learning topics | Store for metrics/analysis |
+| `comment-url` | URL of the created/updated PR comment    | Send notifications         |
+
+<details>
+<summary><b>📝 Advanced Configuration Examples</b></summary>
+
+### Language-Specific Configuration
 
 ```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v4
+# Python Projects
+- uses: hyperskill/skilllens-action@v1
+  with:
+    default-language: Python
+    max-topics: 5
 
-  - name: Test Local Action
-    id: test-action
-    uses: actions/typescript-action@v1 # Commit with the `v1` tag
-    with:
-      milliseconds: 1000
+# JavaScript/TypeScript Projects
+- uses: hyperskill/skilllens-action@v1
+  with:
+    default-language: JavaScript
+    min-confidence: 0.7
 
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
+# Java Projects
+- uses: hyperskill/skilllens-action@v1
+  with:
+    default-language: Java
+    fail-on-proxy-error: true
 ```
 
-## Publishing a New Release
+### Using Outputs
 
-This project includes a helper script, [`script/release`](./script/release)
-designed to streamline the process of tagging and pushing new releases for
-GitHub Actions.
+```yaml
+- name: Generate Recommendations
+  id: skilllens
+  uses: hyperskill/skilllens-action@v1
 
-GitHub Actions allows users to select a specific version of the action to use,
-based on release tags. This script simplifies this process by performing the
-following steps:
+- name: Save Topics
+  run: echo "${{ steps.skilllens.outputs.topics-json }}" > topics.json
 
-1. **Retrieving the latest release tag:** The script starts by fetching the most
-   recent SemVer release tag of the current branch, by looking at the local data
-   available in your repository.
-1. **Prompting for a new release tag:** The user is then prompted to enter a new
-   release tag. To assist with this, the script displays the tag retrieved in
-   the previous step, and validates the format of the inputted tag (vX.X.X). The
-   user is also reminded to update the version field in package.json.
-1. **Tagging the new release:** The script then tags a new release and syncs the
-   separate major tag (e.g. v1, v2) with the new release tag (e.g. v1.0.0,
-   v2.1.2). When the user is creating a new major release, the script
-   auto-detects this and creates a `releases/v#` branch for the previous major
-   version.
-1. **Pushing changes to remote:** Finally, the script pushes the necessary
-   commits, tags and branches to the remote repository. From here, you will need
-   to create a new release in GitHub so users can easily reference the new tags
-   in their workflows.
+- name: Notify Slack
+  if: steps.skilllens.outputs.comment-url
+  run: |
+    curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+      -d "text=New learning recommendations: \
+      ${{ steps.skilllens.outputs.comment-url }}"
+```
 
-## Dependency License Management
+</details>
 
-This template includes a GitHub Actions workflow,
-[`licensed.yml`](./.github/workflows/licensed.yml), that uses
-[Licensed](https://github.com/licensee/licensed) to check for dependencies with
-missing or non-compliant licenses. This workflow is initially disabled. To
-enable the workflow, follow the below steps.
+## 🔒 Privacy & Security
 
-1. Open [`licensed.yml`](./.github/workflows/licensed.yml)
-1. Uncomment the following lines:
+> **Your code stays yours.** SkillLens is built on privacy-first principles.
 
-   ```yaml
-   # pull_request:
-   #   branches:
-   #     - main
-   # push:
-   #   branches:
-   #     - main
-   ```
+### What We Access
 
-1. Save and commit the changes
+✅ PR review comments and feedback ✅ Repository metadata (name, PR number) ✅
+Public PR conversation threads
 
-Once complete, this workflow will run any time a pull request is created or
-changes pushed directly to `main`. If the workflow detects any dependencies with
-missing or non-compliant licenses, it will fail the workflow and provide details
-on the issue(s) found.
+### What We DON'T Access
 
-### Updating Licenses
+❌ Your source code ❌ File contents ❌ Private repository data ❌ Secrets or
+credentials
 
-Whenever you install or update dependencies, you can use the Licensed CLI to
-update the licenses database. To install Licensed, see the project's
-[Readme](https://github.com/licensee/licensed?tab=readme-ov-file#installation).
+### Authentication
 
-To update the cached licenses, run the following command:
+- Uses GitHub's secure OIDC tokens (no API keys required)
+- Tokens are short-lived and scoped to the workflow
+- Backend verification ensures only legitimate GitHub Actions can call our API
+
+### Required Permissions
+
+| Permission      | Level | Purpose                           |
+| --------------- | ----- | --------------------------------- |
+| `contents`      | read  | Read repository metadata          |
+| `pull-requests` | read  | Fetch PR review comments          |
+| `issues`        | write | Create/update PR comments         |
+| `id-token`      | write | Request OIDC authentication token |
+
+## 🎯 Use Cases
+
+### For Development Teams
+
+Build a **culture of continuous learning** by automatically connecting code
+review feedback to educational resources. Perfect for onboarding, skill
+development, and knowledge sharing.
+
+### For Open Source Projects
+
+Support **contributor growth** by providing learning resources alongside review
+feedback. Reduce back-and-forth by helping contributors understand the "why"
+behind suggestions.
+
+### For Individual Developers
+
+Turn every PR into a **personalized learning opportunity**. Never wonder where
+to learn a concept mentioned in reviews — get instant, relevant recommendations.
+
+### For Engineering Managers
+
+Track **skill development trends** across your team. Identify common learning
+needs and inform training priorities based on actual code review patterns.
+
+## 🤝 Comparison with Alternatives
+
+| Feature              | Manual Learning Search | AI Code Reviewers    | SkillLens         |
+| -------------------- | ---------------------- | -------------------- | ----------------- |
+| **Automated**        | ❌ Manual effort       | ✅ Yes               | ✅ Yes            |
+| **Learning-Focused** | ⚠️ If you remember     | ❌ Code quality only | ✅ Primary focus  |
+| **Privacy**          | ✅ No tool needed      | ❌ Reads source code | ✅ Reviews only   |
+| **Setup Complexity** | N/A                    | 🔧 API keys required | ✅ Zero config    |
+| **Cost**             | Time-consuming         | 💰 Usually paid      | 🆓 Free           |
+| **Noise Level**      | N/A                    | 📢 Multiple comments | 🔇 Single comment |
+
+## ❓ Frequently Asked Questions
+
+<details>
+<summary><b>Does SkillLens read my source code?</b></summary>
+
+No. SkillLens only analyzes PR review comments and feedback. It never accesses
+your repository's source code, ensuring complete privacy and security.
+
+</details>
+
+<details>
+<summary><b>What programming languages are supported?</b></summary>
+
+SkillLens supports all languages available on Hyperskill, including:
+
+- Python, Java, JavaScript, TypeScript
+- Kotlin, Go, Scala, C++
+- SQL, Bash, and more
+
+The `default-language` input helps optimize recommendations when the repository
+language cannot be automatically detected.
+
+</details>
+
+<details>
+<summary><b>Can I use this with private repositories?</b></summary>
+
+Yes! SkillLens works with both public and private repositories. It uses GitHub's
+built-in authentication and only accesses review comments, which are already
+visible to workflow runs.
+
+</details>
+
+<details>
+<summary><b>How accurate are the recommendations?</b></summary>
+
+SkillLens uses advanced AI to understand context and nuance in review comments.
+The default confidence threshold of 0.65 ensures only relevant recommendations
+are shown. You can adjust this with the `min-confidence` input.
+
+</details>
+
+<details>
+<summary><b>Will this spam my PRs with comments?</b></summary>
+
+No. SkillLens maintains a single comment per PR that updates in place. It uses a
+hidden HTML marker to identify and update the same comment, preventing
+notification spam.
+
+</details>
+
+<details>
+<summary><b>What if the SkillLens API is down?</b></summary>
+
+By default, the action logs a warning but doesn't fail your workflow. You can
+change this behavior by setting `fail-on-proxy-error: true`.
+
+</details>
+
+## 🚨 Troubleshooting
+
+<details>
+<summary><b>Common Issues and Solutions</b></summary>
+
+### "Error requesting OIDC token"
+
+**Cause:** Missing `id-token: write` permission
+
+**Solution:**
+
+```yaml
+permissions:
+  id-token: write # Add this permission
+  pull-requests: read
+  issues: write
+```
+
+### "No comment appears after reviews"
+
+**Possible causes:**
+
+1. No actionable feedback (filtered noise like "LGTM")
+1. Confidence threshold not met
+1. API communication issue
+
+**Debug steps:**
+
+```yaml
+- uses: hyperskill/skilllens-action@v1
+  with:
+    enable-debug: true # Enable debug logging
+    min-confidence: 0.5 # Lower threshold for testing
+```
+
+### "Action runs but fails immediately"
+
+**Check:**
+
+1. Workflow permissions are correctly set
+1. Action is triggered on correct events
+1. Repository allows GitHub Actions to create comments
+
+**For organizations:** Go to Repository Settings → Actions → General → Workflow
+permissions → Enable "Allow GitHub Actions to create and approve pull requests"
+
+</details>
+
+## 🛠️ Development
+
+<details>
+<summary><b>Local Development Setup</b></summary>
 
 ```bash
-licensed cache
+# Clone the repository
+git clone https://github.com/hyperskill/skilllens-action.git
+cd skilllens-action
+
+# Install dependencies
+npm install
+
+# Run tests
+npm run test
+
+# Run all checks (format, lint, test, bundle)
+npm run all
+
+# Test locally with stubbed GitHub Actions environment
+npm run local-action
 ```
 
-To check the status of cached licenses, run the following command:
+### Important: Bundle Before Commit
+
+After making changes to TypeScript sources in `src/`:
 
 ```bash
-licensed status
+npm run bundle  # Regenerates dist/index.js
 ```
+
+The `dist/` directory must be committed with your changes.
+
+</details>
+
+## 📊 Roadmap
+
+- [ ] Support for custom learning platforms beyond Hyperskill
+- [ ] Team-level skill gap aggregation dashboard
+- [ ] IDE integrations (Visual Studio Code, JetBrains)
+- [ ] Multi-language UI support
+- [ ] Webhook support for external integrations
+- [ ] Historical learning trends analysis
+
+## 👥 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for
+guidelines.
+
+**Quick contribution checklist:**
+
+- Fork and create a feature branch
+- Make changes to TypeScript files in `src/`
+- Run `npm run all` to ensure all checks pass
+- Update `dist/` with `npm run bundle`
+- Submit PR with clear description
+
+## 🙏 Support
+
+- 📖 [Documentation](https://github.com/hyperskill/skilllens-action/wiki)
+- 🐛 [Report Issues](https://github.com/hyperskill/skilllens-action/issues)
+- 💡
+  [Request Features](https://github.com/hyperskill/skilllens-action/discussions)
+- 📧 Email: [support@skilllens.dev](mailto:support@skilllens.dev)
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🌟 Acknowledgments
+
+- Built with
+  [actions/typescript-action](https://github.com/actions/typescript-action)
+- Powered by [Hyperskill](https://hyperskill.org)
+- Uses
+  [GitHub OIDC](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
+  for secure authentication
+
+---
+
+**⭐ Star this repository** if SkillLens helps your team learn and grow!
+
+**📢 Share your experience** with the community using #SkillLens

@@ -20,7 +20,7 @@ A zero‑config Action that reads **existing PR review feedback** (human/AI), se
    - **Inline** review comments for the PR.
    - **PR reviews** (Approve/Changes Requested/Comment body).
    - **Conversation** comments on the PR (via Issues API). :contentReference[oaicite:2]{index=2}
-3. Normalize review text; trim long code fences (**no repository code** is read).
+3. Normalize review text (**no repository code** is read).
 4. Request a GitHub **OIDC ID token** (job must grant `id-token: write`) and call the SkillLens Proxy (`POST /v1/recommendations`). :contentReference[oaicite:3]{index=3}
 5. Receive `commentMarkdown` + `topics[]`; upsert a **single** PR comment (Issues API). :contentReference[oaicite:4]{index=4}
 
@@ -72,9 +72,6 @@ branding:
 
 ```yaml
 inputs:
-  skilllens-api-url:
-    description: "SkillLens Proxy endpoint (e.g., https://<your-backend>/v1/recommendations)"
-    required: true
   oidc-audience:
     description: "OIDC audience to request for ID token (matches backend expected 'aud')"
     required: false
@@ -132,7 +129,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
   issues: write
   id-token: write
 
@@ -143,7 +140,6 @@ jobs:
     steps:
       - uses: <you>/skilllens-action@v1
         with:
-          skilllens-api-url: https://<your-backend>/v1/recommendations
           oidc-audience: skilllens.dev
           default-language: Python
           max-topics: 5
@@ -170,10 +166,9 @@ Using Octokit with the job’s `GITHUB_TOKEN`:
 * **Conversation comments**: `issues.listComments({ owner, repo, issue_number })`.
   Each returns paginated results; we fetch recent pages until we reach a safe cap (e.g., 250 items). ([GitHub Docs][4])
 
-### 6.3 Normalization (privacy)
+### 6.3 Normalization
 
-* Drop trivial/noisy items (e.g., “LGTM”, emoji‑only).
-* **Trim fenced code blocks** inside comment bodies to ≤ 200 chars per block.
+* Drop trivial/noisy items (e.g., "LGTM", emoji‑only).
 * Keep `{type: 'inline'|'review'|'conversation', body, path?, author_login, created_at}`.
 
 ### 6.4 OIDC Token
@@ -184,7 +179,7 @@ Using Octokit with the job’s `GITHUB_TOKEN`:
 
 ### 6.5 Call Proxy
 
-* POST `${skilllens-api-url}` with JSON body:
+* POST `https://api.skilllens.dev/v1/recommendations` with JSON body:
 
   ```json
   {
@@ -237,16 +232,8 @@ async function listData(octokit: ReturnType<typeof github.getOctokit>, owner: st
   ]);
 
   const items: ReviewItem[] = [];
-  // map each response into normalized items (trim code fences, drop noise)
+  // map each response into normalized items (drop noise)
   return items;
-}
-
-function redactCodeFences(body: string, max = 200): string {
-  // replace ```...``` blocks with trimmed content
-  return body.replace(/```([\s\S]*?)```/g, (_m, p1) => {
-    const s = String(p1);
-    return '```' + (s.length > max ? s.slice(0, max) + '…' : s) + '```';
-  });
 }
 
 async function upsertComment(octokit: ReturnType<typeof github.getOctokit>, owner: string, repo: string, pr: number, marker: string, markdown: string) {
@@ -279,7 +266,6 @@ async function run() {
       return;
     }
 
-    const apiUrl = core.getInput('skilllens-api-url', { required: true });
     const audience = core.getInput('oidc-audience') || 'skilllens.dev';
     const idToken = await core.getIDToken(audience);
 
@@ -289,7 +275,7 @@ async function run() {
       minConfidence: Number(core.getInput('min-confidence') || '0.65')
     };
 
-    const resp = await fetch(apiUrl, {
+    const resp = await fetch('https://api.skilllens.dev/v1/recommendations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
       body: JSON.stringify({ repo: { owner, name: repo, prNumber: pr }, reviews: items, defaults })
@@ -345,13 +331,13 @@ run();
   ```yaml
   permissions:
     contents: read
-    pull-requests: write
+    pull-requests: read
     issues: write
     id-token: write
   ```
 
   * `GITHUB_TOKEN` is recommended for GitHub API calls from workflows; permissions are scoped via `permissions:`. ([GitHub Docs][1])
-  * OIDC is requested via `core.getIDToken(aud)`, per GitHub’s OIDC docs. ([GitHub Docs][5])
+  * OIDC is requested via `core.getIDToken(aud)`, per GitHub's OIDC docs. ([GitHub Docs][5])
 
 * **Data policy** in README:
 
