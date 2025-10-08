@@ -31388,6 +31388,15 @@ async function run() {
         debug(`Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`);
         debug(`Fail on proxy error: ${failOnProxyError}`);
         debug(`Calling SkillLens API with ${items.length} review item(s)`);
+        const requestBody = {
+            repo: { owner, name: repo, prNumber: pr },
+            reviews: items,
+            defaults
+        };
+        debug(`Request URL: ${SKILLLENS_API_URL}`);
+        debug(`Request Method: POST`);
+        debug(`Request Headers: Content-Type=application/json, Authorization=Bearer ${idToken.substring(0, 10)}...`);
+        debug(`Request Body: ${JSON.stringify(requestBody, null, 2)}`);
         let resp;
         try {
             resp = await fetch(SKILLLENS_API_URL, {
@@ -31397,11 +31406,7 @@ async function run() {
                     Authorization: `Bearer ${idToken}`,
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({
-                    repo: { owner, name: repo, prNumber: pr },
-                    reviews: items,
-                    defaults
-                })
+                body: JSON.stringify(requestBody)
             });
         }
         catch (fetchError) {
