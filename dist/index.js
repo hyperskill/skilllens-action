@@ -31404,7 +31404,9 @@ async function run() {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${idToken}`,
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Referer: 'https://skill-lens-replit2142.replit.app/',
+                    Origin: 'https://skill-lens-replit2142.replit.app'
                 },
                 body: JSON.stringify(requestBody)
             });
