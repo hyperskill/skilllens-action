@@ -31394,7 +31394,8 @@ async function run() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${idToken}`
+                    Authorization: `Bearer ${idToken}`,
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     repo: { owner, name: repo, prNumber: pr },
