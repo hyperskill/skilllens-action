@@ -63,7 +63,6 @@ jobs:
         id: test-action
         uses: ./
         with:
-          skilllens-api-url: 'https://example.com/api/v1/recommendations'
           fail-on-proxy-error: 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
