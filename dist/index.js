@@ -31395,9 +31395,7 @@ async function run() {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${idToken}`,
-                    'X-Requested-With': 'XMLHttpRequest',
-                    Origin: 'https://github.com',
-                    Referer: `https://github.com/${owner}/${repo}/pull/${pr}`
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     repo: { owner, name: repo, prNumber: pr },
