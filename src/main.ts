@@ -229,7 +229,15 @@ export async function run(): Promise<void> {
 
     debug(`API response status: ${resp.status}`)
     if (!resp.ok) {
-      const msg = `Proxy error ${resp.status}: ${await resp.text()}`
+      const errorBody = await resp.text()
+      const errorDetails = {
+        status: resp.status,
+        statusText: resp.statusText,
+        body: errorBody,
+        headers: Object.fromEntries(resp.headers.entries())
+      }
+      const msg = `Proxy error ${resp.status} ${resp.statusText}: ${errorBody}\nFull response: ${JSON.stringify(errorDetails, null, 2)}`
+      debug(`Full error response: ${JSON.stringify(errorDetails, null, 2)}`)
       if (failOnProxyError) {
         core.setFailed(msg)
         return
