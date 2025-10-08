@@ -255,6 +255,29 @@ describe('main.ts', () => {
       )
     })
 
+    it('Fails when no GitHub token is provided', async () => {
+      // Remove the token from environment
+      delete process.env.GITHUB_TOKEN
+
+      // Ensure getInput also returns empty for github-token
+      core.getInput.mockImplementation((name: string) => {
+        const inputs: Record<string, string> = {
+          'oidc-audience': 'skilllens.dev',
+          'default-language': 'Python',
+          'max-topics': '5',
+          'min-confidence': '0.65',
+          'comment-marker': '<!-- SkillLens:v0 -->',
+          'fail-on-proxy-error': 'false'
+        }
+        return inputs[name] || ''
+      })
+
+      await run()
+
+      expect(core.setFailed).toHaveBeenCalledWith('GITHUB_TOKEN is required')
+      expect(github.getOctokit).not.toHaveBeenCalled()
+    })
+
     it('Exits early when no review content found', async () => {
       const mockOctokit = {
         rest: {
