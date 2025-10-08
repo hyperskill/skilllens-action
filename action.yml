@@ -1,6 +1,7 @@
-name: 'SkillLens — PR Review → Hyperskill'
+name: 'SkillLens: PR Review Learning & Developer Growth'
 description:
-  'Parses PR review feedback and posts learning recommendations from Hyperskill.'
+  'Transform PR review feedback into personalized learning paths with Hyperskill
+  courses. Automate skill gap analysis and developer education.'
 author: 'Hyperskill / SkillLens'
 
 branding:

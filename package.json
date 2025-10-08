@@ -1,20 +1,38 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "0.0.0",
-  "author": "",
+  "name": "skilllens-action",
+  "description": "GitHub Action: PR review feedback to personalized learning recommendations from Hyperskill",
+  "version": "0.0.1",
+  "author": "Hyperskill <support@hyperskill.org>",
   "type": "module",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/hyperskill/skilllens-action",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/hyperskill/skilllens-action.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/hyperskill/skilllens-action/issues"
   },
   "keywords": [
-    "actions"
+    "actions",
+    "github-actions",
+    "code-review",
+    "pr-review",
+    "developer-education",
+    "learning",
+    "skill-development",
+    "hyperskill",
+    "education",
+    "training",
+    "skill-gap-analysis",
+    "developer-growth",
+    "continuous-learning",
+    "code-feedback",
+    "learning-recommendations",
+    "programming-education",
+    "developer-tools",
+    "ci-cd",
+    "automation"
   ],
   "exports": {
     ".": "./dist/index.js"
