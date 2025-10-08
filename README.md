@@ -8,8 +8,8 @@
 
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-SkillLens-blue.svg?colorA=24292e&colorB=0366d6&style=flat-square&logo=github)](https://github.com/marketplace/actions/skilllens-pr-review-learning-developer-growth)
 [![Powered by Hyperskill](https://img.shields.io/badge/Powered%20by-Hyperskill-purple?style=flat-square)](https://hyperskill.org)
-[![Privacy: No Code Access](https://img.shields.io/badge/Privacy-No%20Code%20Access-success?style=flat-square)](#privacy--security)
-[![Setup: Zero Config](https://img.shields.io/badge/Setup-Zero%20Config-brightgreen?style=flat-square)](#quick-start)
+[![Privacy: No Code Access](https://img.shields.io/badge/Privacy-No%20Code%20Access-success?style=flat-square)](#-privacy--security)
+[![Setup: Zero Config](https://img.shields.io/badge/Setup-Zero%20Config-brightgreen?style=flat-square)](#-quick-start)
 
 > **Turn every code review into a learning opportunity.** SkillLens
 > automatically analyzes PR review feedback and suggests relevant learning
@@ -81,10 +81,10 @@ recommendations when reviewers provide feedback.
 ## 📖 How It Works
 
 1. **Monitors** PR reviews, inline comments, and conversation threads
-2. **Filters** noise (LGTM, emojis) to focus on substantive feedback
-3. **Analyzes** comments using AI to identify learning opportunities
-4. **Matches** topics with Hyperskill's comprehensive course catalog
-5. **Posts** a single, updateable comment with personalized recommendations
+1. **Filters** noise (LGTM, emojis) to focus on substantive feedback
+1. **Analyzes** comments using AI to identify learning opportunities
+1. **Matches** topics with Hyperskill's comprehensive course catalog
+1. **Posts** a single, updateable comment with personalized recommendations
 
 <details>
 <summary><b>See an Example Output</b></summary>
@@ -124,14 +124,14 @@ optimization in Python applications
 
 ### Inputs
 
-| Input                 | Description                                  | Required | Default         | Example              |
-| --------------------- | -------------------------------------------- | -------- | --------------- | -------------------- |
-| `oidc-audience`       | OIDC audience for backend authentication     | No       | `skilllens.dev` | `custom.domain.com`  |
-| `default-language`    | Fallback language when repo language unknown | No       | `Python`        | `JavaScript`, `Java` |
-| `max-topics`          | Maximum learning topics to include           | No       | `5`             | `3`, `10`            |
-| `min-confidence`      | Minimum confidence threshold (0-1)           | No       | `0.65`          | `0.5`, `0.8`         |
-| `fail-on-proxy-error` | Fail workflow on backend errors              | No       | `false`         | `true`               |
-| `enable-debug`        | Enable detailed debug logging                | No       | `false`         | `true`               |
+| Input                 | Description                                        | Required | Default         | Example              |
+| --------------------- | -------------------------------------------------- | -------- | --------------- | -------------------- |
+| `oidc-audience`       | OIDC audience for backend authentication           | No       | `skilllens.dev` | `custom.domain.com`  |
+| `default-language`    | Fallback language when repository language unknown | No       | `Python`        | `JavaScript`, `Java` |
+| `max-topics`          | Maximum learning topics to include                 | No       | `5`             | `3`, `10`            |
+| `min-confidence`      | Minimum confidence threshold (0-1)                 | No       | `0.65`          | `0.5`, `0.8`         |
+| `fail-on-proxy-error` | Fail workflow on backend errors                    | No       | `false`         | `true`               |
+| `enable-debug`        | Enable detailed debug logging                      | No       | `false`         | `true`               |
 
 ### Outputs
 
@@ -179,7 +179,8 @@ optimization in Python applications
   if: steps.skilllens.outputs.comment-url
   run: |
     curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
-      -d "text=New learning recommendations: ${{ steps.skilllens.outputs.comment-url }}"
+      -d "text=New learning recommendations: \
+      ${{ steps.skilllens.outputs.comment-url }}"
 ```
 
 </details>
@@ -330,8 +331,8 @@ permissions:
 **Possible causes:**
 
 1. No actionable feedback (filtered noise like "LGTM")
-2. Confidence threshold not met
-3. API communication issue
+1. Confidence threshold not met
+1. API communication issue
 
 **Debug steps:**
 
@@ -347,8 +348,8 @@ permissions:
 **Check:**
 
 1. Workflow permissions are correctly set
-2. Action is triggered on correct events
-3. Repository allows GitHub Actions to create comments
+1. Action is triggered on correct events
+1. Repository allows GitHub Actions to create comments
 
 **For organizations:** Go to Repository Settings → Actions → General → Workflow
 permissions → Enable "Allow GitHub Actions to create and approve pull requests"
@@ -394,7 +395,7 @@ The `dist/` directory must be committed with your changes.
 
 - [ ] Support for custom learning platforms beyond Hyperskill
 - [ ] Team-level skill gap aggregation dashboard
-- [ ] IDE integrations (VS Code, JetBrains)
+- [ ] IDE integrations (Visual Studio Code, JetBrains)
 - [ ] Multi-language UI support
 - [ ] Webhook support for external integrations
 - [ ] Historical learning trends analysis
@@ -418,7 +419,7 @@ guidelines.
 - 🐛 [Report Issues](https://github.com/hyperskill/skilllens-action/issues)
 - 💡
   [Request Features](https://github.com/hyperskill/skilllens-action/discussions)
-- 📧 Email: support@skilllens.dev
+- 📧 Email: [support@skilllens.dev](mailto:support@skilllens.dev)
 
 ## 📄 License
 
@@ -435,6 +436,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**⭐ Star this repo** if SkillLens helps your team learn and grow!
+**⭐ Star this repository** if SkillLens helps your team learn and grow!
 
 **📢 Share your experience** with the community using #SkillLens
