@@ -31248,21 +31248,6 @@ function debug(message) {
         coreExports.debug(message);
     }
 }
-function redactCodeFences(body, max = 200) {
-    let trimCount = 0;
-    const result = body.replace(/```([\s\S]*?)```/g, (_m, p1) => {
-        const s = String(p1);
-        if (s.length > max) {
-            trimCount++;
-            return '```' + s.slice(0, max) + '…' + '```';
-        }
-        return '```' + s + '```';
-    });
-    if (trimCount > 0) {
-        debug(`Trimmed ${trimCount} code fence(s) exceeding ${max} chars`);
-    }
-    return result;
-}
 function isNoisy(body) {
     const trimmed = body.trim().toLowerCase();
     if (trimmed.length === 0) {
@@ -31303,7 +31288,7 @@ async function listData(octokit, owner, repo, pr) {
         if (comment.body && !isNoisy(comment.body)) {
             items.push({
                 type: 'inline',
-                body: redactCodeFences(comment.body),
+                body: comment.body,
                 path: comment.path,
                 author: comment.user?.login,
                 created_at: comment.created_at
@@ -31314,7 +31299,7 @@ async function listData(octokit, owner, repo, pr) {
         if (review.body && !isNoisy(review.body)) {
             items.push({
                 type: 'review',
-                body: redactCodeFences(review.body),
+                body: review.body,
                 author: review.user?.login,
                 created_at: review.submitted_at || ''
             });
@@ -31324,7 +31309,7 @@ async function listData(octokit, owner, repo, pr) {
         if (comment.body && !isNoisy(comment.body)) {
             items.push({
                 type: 'conversation',
-                body: redactCodeFences(comment.body),
+                body: comment.body,
                 author: comment.user?.login,
                 created_at: comment.created_at
             });

@@ -8,8 +8,7 @@ import * as github from '../__fixtures__/github.js'
 jest.unstable_mockModule('@actions/core', () => core)
 jest.unstable_mockModule('@actions/github', () => github)
 
-const { run, redactCodeFences, isNoisy, listData, upsertComment } =
-  await import('../src/main.js')
+const { run, isNoisy, listData, upsertComment } = await import('../src/main.js')
 
 describe('main.ts', () => {
   beforeEach(() => {
@@ -36,21 +35,6 @@ describe('main.ts', () => {
 
   afterEach(() => {
     delete process.env.GITHUB_TOKEN
-  })
-
-  describe('redactCodeFences', () => {
-    it('Trims long code blocks', () => {
-      const input = '```' + 'x'.repeat(300) + '```'
-      const result = redactCodeFences(input, 200)
-      expect(result).toContain('…')
-      expect(result.length).toBeLessThan(input.length)
-    })
-
-    it('Leaves short code blocks unchanged', () => {
-      const input = '```console\necho "hello"\n```'
-      const result = redactCodeFences(input, 200)
-      expect(result).toBe(input)
-    })
   })
 
   describe('isNoisy', () => {

@@ -20,7 +20,7 @@ A zero‑config Action that reads **existing PR review feedback** (human/AI), se
    - **Inline** review comments for the PR.
    - **PR reviews** (Approve/Changes Requested/Comment body).
    - **Conversation** comments on the PR (via Issues API). :contentReference[oaicite:2]{index=2}
-3. Normalize review text; trim long code fences (**no repository code** is read).
+3. Normalize review text (**no repository code** is read).
 4. Request a GitHub **OIDC ID token** (job must grant `id-token: write`) and call the SkillLens Proxy (`POST /v1/recommendations`). :contentReference[oaicite:3]{index=3}
 5. Receive `commentMarkdown` + `topics[]`; upsert a **single** PR comment (Issues API). :contentReference[oaicite:4]{index=4}
 
@@ -166,10 +166,9 @@ Using Octokit with the job’s `GITHUB_TOKEN`:
 * **Conversation comments**: `issues.listComments({ owner, repo, issue_number })`.
   Each returns paginated results; we fetch recent pages until we reach a safe cap (e.g., 250 items). ([GitHub Docs][4])
 
-### 6.3 Normalization (privacy)
+### 6.3 Normalization
 
-* Drop trivial/noisy items (e.g., “LGTM”, emoji‑only).
-* **Trim fenced code blocks** inside comment bodies to ≤ 200 chars per block.
+* Drop trivial/noisy items (e.g., "LGTM", emoji‑only).
 * Keep `{type: 'inline'|'review'|'conversation', body, path?, author_login, created_at}`.
 
 ### 6.4 OIDC Token
@@ -233,16 +232,8 @@ async function listData(octokit: ReturnType<typeof github.getOctokit>, owner: st
   ]);
 
   const items: ReviewItem[] = [];
-  // map each response into normalized items (trim code fences, drop noise)
+  // map each response into normalized items (drop noise)
   return items;
-}
-
-function redactCodeFences(body: string, max = 200): string {
-  // replace ```...``` blocks with trimmed content
-  return body.replace(/```([\s\S]*?)```/g, (_m, p1) => {
-    const s = String(p1);
-    return '```' + (s.length > max ? s.slice(0, max) + '…' : s) + '```';
-  });
 }
 
 async function upsertComment(octokit: ReturnType<typeof github.getOctokit>, owner: string, repo: string, pr: number, marker: string, markdown: string) {

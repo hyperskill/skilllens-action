@@ -56,7 +56,7 @@ npm run local-action
    - Inline review comments (`pulls.listReviewComments`)
    - PR reviews with state/body (`pulls.listReviews`)
    - Conversation comments (`issues.listComments`)
-3. **Normalize**: Filter noisy comments, trim code fences to ≤200 chars (privacy protection)
+3. **Normalize**: Filter noisy comments
 4. **Authenticate**: Request GitHub OIDC ID token (requires `id-token: write` permission)
 5. **API Call**: POST to SkillLens Proxy with normalized reviews + OIDC token
 6. **Comment**: Upsert single PR comment using marker (`<!-- SkillLens:v0 -->`) for idempotency
@@ -66,7 +66,6 @@ npm run local-action
 **`src/main.ts`**: Main entry point containing:
 - `run()`: Main execution function called by GitHub Actions
 - `listData()`: Fetches and normalizes all review data from GitHub API
-- `redactCodeFences()`: Trims code blocks for privacy (no repo code sent to proxy)
 - `isNoisy()`: Filters trivial comments (emoji-only, "LGTM", etc.)
 - `upsertComment()`: Creates or updates the single SkillLens PR comment
 
@@ -74,11 +73,6 @@ npm run local-action
 - Inputs: `oidc-audience`, `default-language`, `max-topics`, `min-confidence`, `comment-marker`, `fail-on-proxy-error`, `enable-debug`
 - Outputs: `topics-json`, `comment-url`
 - Runtime: `node24` executing `dist/index.js`
-
-### Privacy Model
-- **Reads**: Only PR review comments (never repository source code)
-- **Sends**: Normalized review text with trimmed code fences
-- **Posts**: Single bot comment per PR (idempotent via hidden marker)
 
 ## Testing
 
@@ -171,7 +165,6 @@ permissions:
 - Workflow must grant `id-token: write` permission
 - No repository source code is accessed or transmitted
 - Only review comments are processed
-- Code fences trimmed to 200 chars before transmission
 
 ## Key Files Reference
 
@@ -195,7 +188,6 @@ permissions:
 3. **Using console**: Use `@actions/core` logging methods instead of `console.log`
 4. **Missing permissions**: Consumers need `id-token: write` for OIDC authentication
 5. **Testing without mocks**: Mock GitHub API and proxy responses in tests
-6. **Code in comments**: Remember code fences are trimmed — action doesn't analyze repo code
 
 ## Development Container
 
