@@ -204,30 +204,45 @@ export async function run(): Promise<void> {
       minConfidence: Number(core.getInput('min-confidence'))
     }
 
+    const failOnProxyError = core.getInput('fail-on-proxy-error') === 'true'
+
     debug(`OIDC Audience: ${audience}`)
     debug(
       `Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`
     )
+    debug(`Fail on proxy error: ${failOnProxyError}`)
 
     debug(`Calling SkillLens API with ${items.length} review item(s)`)
-    const resp = await fetch(SKILLLENS_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${idToken}`
-      },
-      body: JSON.stringify({
-        repo: { owner, name: repo, prNumber: pr },
-        reviews: items,
-        defaults
+
+    let resp: Response
+    try {
+      resp = await fetch(SKILLLENS_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          repo: { owner, name: repo, prNumber: pr },
+          reviews: items,
+          defaults
+        })
       })
-    })
+    } catch (fetchError) {
+      const msg = `Network error calling SkillLens API: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
+      debug(msg)
+      if (failOnProxyError) {
+        core.setFailed(msg)
+        return
+      }
+      core.warning(msg)
+      return
+    }
 
     debug(`API response status: ${resp.status}`)
     if (!resp.ok) {
-      const fail = core.getInput('fail-on-proxy-error') === 'true'
       const msg = `Proxy error ${resp.status}: ${await resp.text()}`
-      if (fail) {
+      if (failOnProxyError) {
         core.setFailed(msg)
         return
       }

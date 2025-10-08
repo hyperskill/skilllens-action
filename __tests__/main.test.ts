@@ -345,6 +345,40 @@ describe('main.ts', () => {
       )
     })
 
+    it('Handles network error with warning when fail-on-proxy-error is false', async () => {
+      mockFetch.mockRejectedValue(new Error('ENOTFOUND: DNS resolution failed'))
+
+      await run()
+
+      expect(core.warning).toHaveBeenCalledWith(
+        'Network error calling SkillLens API: ENOTFOUND: DNS resolution failed'
+      )
+      expect(core.setFailed).not.toHaveBeenCalled()
+    })
+
+    it('Fails workflow when network error and fail-on-proxy-error is true', async () => {
+      core.getInput.mockImplementation((name: string) => {
+        const inputs: Record<string, string> = {
+          'oidc-audience': 'skilllens.dev',
+          'default-language': 'Python',
+          'max-topics': '5',
+          'min-confidence': '0.65',
+          'comment-marker': '<!-- SkillLens:v0 -->',
+          'fail-on-proxy-error': 'true'
+        }
+        return inputs[name] || ''
+      })
+
+      mockFetch.mockRejectedValue(new Error('Connection refused'))
+
+      await run()
+
+      expect(core.setFailed).toHaveBeenCalledWith(
+        'Network error calling SkillLens API: Connection refused'
+      )
+      expect(core.warning).not.toHaveBeenCalled()
+    })
+
     it('Exits when proxy returns no commentMarkdown', async () => {
       mockFetch.mockResolvedValue({
         ok: true,
