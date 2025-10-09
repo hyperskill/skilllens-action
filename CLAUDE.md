@@ -190,7 +190,6 @@ permissions:
 | `package.json` | Dependencies and scripts |
 | `tsconfig.json` | TypeScript compiler configuration |
 | `.env.example` | Template for local action testing |
-| `SPEC.md` | Detailed specification document |
 
 ## Common Pitfalls
 
