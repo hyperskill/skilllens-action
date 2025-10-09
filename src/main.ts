@@ -4,14 +4,6 @@ import * as github from '@actions/github'
 const SKILLLENS_API_URL =
   'https://skilllens-25qt.onrender.com/v1/recommendations'
 
-let debugEnabled = false
-
-function debug(message: string): void {
-  if (debugEnabled) {
-    core.debug(message)
-  }
-}
-
 export type ReviewItem = {
   type: 'inline' | 'review' | 'conversation'
   body: string
@@ -23,11 +15,11 @@ export type ReviewItem = {
 export function isNoisy(body: string): boolean {
   const trimmed = body.trim().toLowerCase()
   if (trimmed.length === 0) {
-    debug('Filtered noisy comment: empty')
+    core.debug('Filtered noisy comment: empty')
     return true
   }
   if (trimmed.length <= 5 && /^[👍👎✅❌🎉💯lgtm]+$/u.test(trimmed)) {
-    debug(`Filtered noisy comment: "${trimmed}"`)
+    core.debug(`Filtered noisy comment: "${trimmed}"`)
     return true
   }
   return false
@@ -39,7 +31,7 @@ export async function listData(
   repo: string,
   pr: number
 ): Promise<ReviewItem[]> {
-  debug(`Fetching review data for PR #${pr} in ${owner}/${repo}`)
+  core.debug(`Fetching review data for PR #${pr} in ${owner}/${repo}`)
   const [inline, reviews, convo] = await Promise.all([
     octokit.rest.pulls.listReviewComments({
       owner,
@@ -61,7 +53,7 @@ export async function listData(
     })
   ])
 
-  debug(
+  core.debug(
     `Fetched ${inline.data.length} inline comment(s), ${reviews.data.length} review(s), ${convo.data.length} conversation comment(s)`
   )
 
@@ -101,7 +93,9 @@ export async function listData(
     }
   }
 
-  debug(`Returning ${items.length} non-noisy review item(s) after filtering`)
+  core.debug(
+    `Returning ${items.length} non-noisy review item(s) after filtering`
+  )
   return items
 }
 
@@ -113,7 +107,7 @@ export async function upsertComment(
   marker: string,
   markdown: string
 ): Promise<string> {
-  debug(`Looking for existing comment with marker: ${marker}`)
+  core.debug(`Looking for existing comment with marker: ${marker}`)
   const existing = await octokit.rest.issues.listComments({
     owner,
     repo,
@@ -125,40 +119,37 @@ export async function upsertComment(
   const fullBody = `${marker}\n\n${markdown}`
 
   if (found) {
-    debug(`Updating existing comment (ID: ${found.id})`)
+    core.debug(`Updating existing comment (ID: ${found.id})`)
     await octokit.rest.issues.updateComment({
       owner,
       repo,
       comment_id: found.id,
       body: fullBody
     })
-    debug(`Updated comment URL: ${found.html_url}`)
+    core.debug(`Updated comment URL: ${found.html_url}`)
     return found.html_url
   } else {
-    debug('Creating new comment (no existing comment found)')
+    core.debug('Creating new comment (no existing comment found)')
     const created = await octokit.rest.issues.createComment({
       owner,
       repo,
       issue_number: pr,
       body: fullBody
     })
-    debug(`Created comment URL: ${created.data.html_url}`)
+    core.debug(`Created comment URL: ${created.data.html_url}`)
     return created.data.html_url
   }
 }
 
 export async function run(): Promise<void> {
   try {
-    debugEnabled = core.getInput('enable-debug') === 'true'
-    debug('Debug logging enabled')
-
     const { owner, repo } = github.context.repo
     const pr =
       github.context.payload.pull_request?.number ??
       github.context.payload.issue?.number
 
-    debug(`Repository: ${owner}/${repo}`)
-    debug(`PR number: ${pr ?? 'not found'}`)
+    core.debug(`Repository: ${owner}/${repo}`)
+    core.debug(`PR number: ${pr ?? 'not found'}`)
 
     if (!pr) {
       core.info('No PR number found in context; exiting.')
@@ -175,7 +166,7 @@ export async function run(): Promise<void> {
 
     const items = await listData(octokit, owner, repo, pr)
     if (items.length === 0) {
-      debug('No review content found after fetching and filtering')
+      core.debug('No review content found after fetching and filtering')
       core.info('No review content to analyze; exiting.')
       return
     }
@@ -191,13 +182,13 @@ export async function run(): Promise<void> {
 
     const failOnProxyError = core.getInput('fail-on-proxy-error') === 'true'
 
-    debug(`OIDC Audience: ${audience}`)
-    debug(
+    core.debug(`OIDC Audience: ${audience}`)
+    core.debug(
       `Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`
     )
-    debug(`Fail on proxy error: ${failOnProxyError}`)
+    core.debug(`Fail on proxy error: ${failOnProxyError}`)
 
-    debug(`Calling SkillLens API with ${items.length} review item(s)`)
+    core.debug(`Calling SkillLens API with ${items.length} review item(s)`)
 
     let resp: Response
     try {
@@ -215,7 +206,7 @@ export async function run(): Promise<void> {
       })
     } catch (fetchError) {
       const msg = `Network error calling SkillLens API: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
-      debug(msg)
+      core.debug(msg)
       if (failOnProxyError) {
         core.setFailed(msg)
         return
@@ -224,7 +215,7 @@ export async function run(): Promise<void> {
       return
     }
 
-    debug(`API response status: ${resp.status}`)
+    core.debug(`API response status: ${resp.status}`)
     if (!resp.ok) {
       const msg = `Proxy error ${resp.status}: ${await resp.text()}`
       if (failOnProxyError) {
@@ -240,17 +231,19 @@ export async function run(): Promise<void> {
       commentMarkdown: string
     }
 
-    debug(`API returned ${data.topics?.length ?? 0} topic(s)`)
-    debug(`Comment markdown length: ${data.commentMarkdown?.length ?? 0} chars`)
+    core.debug(`API returned ${data.topics?.length ?? 0} topic(s)`)
+    core.debug(
+      `Comment markdown length: ${data.commentMarkdown?.length ?? 0} chars`
+    )
 
     if (!data.commentMarkdown) {
-      debug('No comment markdown in API response')
+      core.debug('No comment markdown in API response')
       core.info('Proxy returned no commentMarkdown; nothing to post.')
       return
     }
 
     const marker = core.getInput('comment-marker')
-    debug(`Upserting comment with marker: ${marker}`)
+    core.debug(`Upserting comment with marker: ${marker}`)
 
     const url = await upsertComment(
       octokit,
@@ -264,7 +257,7 @@ export async function run(): Promise<void> {
     core.setOutput('topics-json', JSON.stringify(data.topics ?? []))
     core.setOutput('comment-url', url)
 
-    debug('Action completed successfully')
+    core.debug('Action completed successfully')
   } catch (err) {
     core.setFailed(err instanceof Error ? err.message : String(err))
   }

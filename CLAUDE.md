@@ -70,7 +70,7 @@ npm run local-action
 - `upsertComment()`: Creates or updates the single SkillLens PR comment
 
 **`action.yml`**: Action metadata defining:
-- Inputs: `oidc-audience`, `default-language`, `max-topics`, `min-confidence`, `comment-marker`, `fail-on-proxy-error`, `enable-debug`
+- Inputs: `oidc-audience`, `default-language`, `max-topics`, `min-confidence`, `comment-marker`, `fail-on-proxy-error`
 - Outputs: `topics-json`, `comment-url`
 - Runtime: `node24` executing `dist/index.js`
 

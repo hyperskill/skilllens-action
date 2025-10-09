@@ -31242,26 +31242,20 @@ function requireGithub () {
 var githubExports = requireGithub();
 
 const SKILLLENS_API_URL = 'https://skilllens-25qt.onrender.com/v1/recommendations';
-let debugEnabled = false;
-function debug(message) {
-    if (debugEnabled) {
-        coreExports.debug(message);
-    }
-}
 function isNoisy(body) {
     const trimmed = body.trim().toLowerCase();
     if (trimmed.length === 0) {
-        debug('Filtered noisy comment: empty');
+        coreExports.debug('Filtered noisy comment: empty');
         return true;
     }
     if (trimmed.length <= 5 && /^[👍👎✅❌🎉💯lgtm]+$/u.test(trimmed)) {
-        debug(`Filtered noisy comment: "${trimmed}"`);
+        coreExports.debug(`Filtered noisy comment: "${trimmed}"`);
         return true;
     }
     return false;
 }
 async function listData(octokit, owner, repo, pr) {
-    debug(`Fetching review data for PR #${pr} in ${owner}/${repo}`);
+    coreExports.debug(`Fetching review data for PR #${pr} in ${owner}/${repo}`);
     const [inline, reviews, convo] = await Promise.all([
         octokit.rest.pulls.listReviewComments({
             owner,
@@ -31282,7 +31276,7 @@ async function listData(octokit, owner, repo, pr) {
             per_page: 100
         })
     ]);
-    debug(`Fetched ${inline.data.length} inline comment(s), ${reviews.data.length} review(s), ${convo.data.length} conversation comment(s)`);
+    coreExports.debug(`Fetched ${inline.data.length} inline comment(s), ${reviews.data.length} review(s), ${convo.data.length} conversation comment(s)`);
     const items = [];
     for (const comment of inline.data) {
         if (comment.body && !isNoisy(comment.body)) {
@@ -31315,11 +31309,11 @@ async function listData(octokit, owner, repo, pr) {
             });
         }
     }
-    debug(`Returning ${items.length} non-noisy review item(s) after filtering`);
+    coreExports.debug(`Returning ${items.length} non-noisy review item(s) after filtering`);
     return items;
 }
 async function upsertComment(octokit, owner, repo, pr, marker, markdown) {
-    debug(`Looking for existing comment with marker: ${marker}`);
+    coreExports.debug(`Looking for existing comment with marker: ${marker}`);
     const existing = await octokit.rest.issues.listComments({
         owner,
         repo,
@@ -31329,37 +31323,35 @@ async function upsertComment(octokit, owner, repo, pr, marker, markdown) {
     const found = existing.data.find((c) => c.body?.includes(marker));
     const fullBody = `${marker}\n\n${markdown}`;
     if (found) {
-        debug(`Updating existing comment (ID: ${found.id})`);
+        coreExports.debug(`Updating existing comment (ID: ${found.id})`);
         await octokit.rest.issues.updateComment({
             owner,
             repo,
             comment_id: found.id,
             body: fullBody
         });
-        debug(`Updated comment URL: ${found.html_url}`);
+        coreExports.debug(`Updated comment URL: ${found.html_url}`);
         return found.html_url;
     }
     else {
-        debug('Creating new comment (no existing comment found)');
+        coreExports.debug('Creating new comment (no existing comment found)');
         const created = await octokit.rest.issues.createComment({
             owner,
             repo,
             issue_number: pr,
             body: fullBody
         });
-        debug(`Created comment URL: ${created.data.html_url}`);
+        coreExports.debug(`Created comment URL: ${created.data.html_url}`);
         return created.data.html_url;
     }
 }
 async function run() {
     try {
-        debugEnabled = coreExports.getInput('enable-debug') === 'true';
-        debug('Debug logging enabled');
         const { owner, repo } = githubExports.context.repo;
         const pr = githubExports.context.payload.pull_request?.number ??
             githubExports.context.payload.issue?.number;
-        debug(`Repository: ${owner}/${repo}`);
-        debug(`PR number: ${pr ?? 'not found'}`);
+        coreExports.debug(`Repository: ${owner}/${repo}`);
+        coreExports.debug(`PR number: ${pr ?? 'not found'}`);
         if (!pr) {
             coreExports.info('No PR number found in context; exiting.');
             return;
@@ -31372,7 +31364,7 @@ async function run() {
         const octokit = githubExports.getOctokit(token);
         const items = await listData(octokit, owner, repo, pr);
         if (items.length === 0) {
-            debug('No review content found after fetching and filtering');
+            coreExports.debug('No review content found after fetching and filtering');
             coreExports.info('No review content to analyze; exiting.');
             return;
         }
@@ -31384,10 +31376,10 @@ async function run() {
             minConfidence: Number(coreExports.getInput('min-confidence'))
         };
         const failOnProxyError = coreExports.getInput('fail-on-proxy-error') === 'true';
-        debug(`OIDC Audience: ${audience}`);
-        debug(`Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`);
-        debug(`Fail on proxy error: ${failOnProxyError}`);
-        debug(`Calling SkillLens API with ${items.length} review item(s)`);
+        coreExports.debug(`OIDC Audience: ${audience}`);
+        coreExports.debug(`Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`);
+        coreExports.debug(`Fail on proxy error: ${failOnProxyError}`);
+        coreExports.debug(`Calling SkillLens API with ${items.length} review item(s)`);
         let resp;
         try {
             resp = await fetch(SKILLLENS_API_URL, {
@@ -31405,7 +31397,7 @@ async function run() {
         }
         catch (fetchError) {
             const msg = `Network error calling SkillLens API: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`;
-            debug(msg);
+            coreExports.debug(msg);
             if (failOnProxyError) {
                 coreExports.setFailed(msg);
                 return;
@@ -31413,7 +31405,7 @@ async function run() {
             coreExports.warning(msg);
             return;
         }
-        debug(`API response status: ${resp.status}`);
+        coreExports.debug(`API response status: ${resp.status}`);
         if (!resp.ok) {
             const msg = `Proxy error ${resp.status}: ${await resp.text()}`;
             if (failOnProxyError) {
@@ -31424,19 +31416,19 @@ async function run() {
             return;
         }
         const data = (await resp.json());
-        debug(`API returned ${data.topics?.length ?? 0} topic(s)`);
-        debug(`Comment markdown length: ${data.commentMarkdown?.length ?? 0} chars`);
+        coreExports.debug(`API returned ${data.topics?.length ?? 0} topic(s)`);
+        coreExports.debug(`Comment markdown length: ${data.commentMarkdown?.length ?? 0} chars`);
         if (!data.commentMarkdown) {
-            debug('No comment markdown in API response');
+            coreExports.debug('No comment markdown in API response');
             coreExports.info('Proxy returned no commentMarkdown; nothing to post.');
             return;
         }
         const marker = coreExports.getInput('comment-marker');
-        debug(`Upserting comment with marker: ${marker}`);
+        coreExports.debug(`Upserting comment with marker: ${marker}`);
         const url = await upsertComment(octokit, owner, repo, pr, marker, data.commentMarkdown);
         coreExports.setOutput('topics-json', JSON.stringify(data.topics ?? []));
         coreExports.setOutput('comment-url', url);
-        debug('Action completed successfully');
+        coreExports.debug('Action completed successfully');
     }
     catch (err) {
         coreExports.setFailed(err instanceof Error ? err.message : String(err));

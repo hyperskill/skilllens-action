@@ -139,7 +139,6 @@ optimization in Python applications
 | `max-topics`          | Maximum learning topics to include                 | No       | `5`             | `3`, `10`            |
 | `min-confidence`      | Minimum confidence threshold (0-1)                 | No       | `0.65`          | `0.5`, `0.8`         |
 | `fail-on-proxy-error` | Fail workflow on backend errors                    | No       | `false`         | `true`               |
-| `enable-debug`        | Enable detailed debug logging                      | No       | `false`         | `true`               |
 
 ### Outputs
 
@@ -352,10 +351,16 @@ permissions:
 
 **Debug steps:**
 
+1. Enable debug logging using one of these methods:
+   - Re-run the job with debug logging from GitHub UI (click "Re-run jobs" →
+     "Enable debug logging")
+   - Add a secret named `ACTIONS_STEP_DEBUG` with value `true` to your
+     repository
+2. Lower the confidence threshold for testing:
+
 ```yaml
 - uses: hyperskill/skilllens-action@v1
   with:
-    enable-debug: true # Enable debug logging
     min-confidence: 0.5 # Lower threshold for testing
 ```
 

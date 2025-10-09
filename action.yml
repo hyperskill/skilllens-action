@@ -34,11 +34,6 @@ inputs:
     description: 'Fail the workflow if the proxy returns an error (true/false)'
     required: false
     default: 'false'
-  enable-debug:
-    description:
-      'Enable detailed debug logging for troubleshooting (true/false)'
-    required: false
-    default: 'false'
 
 outputs:
   topics-json:
