@@ -356,7 +356,7 @@ permissions:
      "Enable debug logging")
    - Add a secret named `ACTIONS_STEP_DEBUG` with value `true` to your
      repository
-2. Lower the confidence threshold for testing:
+1. Lower the confidence threshold for testing:
 
 ```yaml
 - uses: hyperskill/skilllens-action@v1
