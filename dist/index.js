@@ -31241,7 +31241,7 @@ function requireGithub () {
 
 var githubExports = requireGithub();
 
-const SKILLLENS_API_URL = 'https://skill-lens-replit2142.replit.app/v1/recommendations';
+const SKILLLENS_API_URL = 'https://skilllens-25qt.onrender.com/v1/recommendations';
 let debugEnabled = false;
 function debug(message) {
     if (debugEnabled) {

@@ -298,7 +298,7 @@ describe('main.ts', () => {
       await run()
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://skill-lens-replit2142.replit.app/v1/recommendations',
+        'https://skilllens-25qt.onrender.com/v1/recommendations',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
