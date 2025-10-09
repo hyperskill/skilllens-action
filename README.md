@@ -484,7 +484,7 @@ guidelines.
 - 🐛 [Report Issues](https://github.com/hyperskill/skilllens-action/issues)
 - 💡
   [Request Features](https://github.com/hyperskill/skilllens-action/discussions)
-- 📧 Email: [support@skilllens.dev](mailto:support@skilllens.dev)
+- 📧 Email: [skilllens@hyperskill.org](mailto:skilllens@hyperskill.org)
 
 ## 📄 License
 
