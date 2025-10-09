@@ -298,7 +298,7 @@ describe('main.ts', () => {
       await run()
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://skilllens-25qt.onrender.com/v1/recommendations',
+        'https://skill-lens-replit2142.replit.app/v1/recommendations',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -322,17 +322,13 @@ describe('main.ts', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error',
-        text: async () => 'Internal server error',
-        headers: new Map([['content-type', 'application/json']])
+        text: async () => 'Internal server error'
       })
 
       await run()
 
       expect(core.warning).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'Proxy error 500 Internal Server Error: Internal server error'
-        )
+        'Proxy error 500: Internal server error'
       )
       expect(core.setFailed).not.toHaveBeenCalled()
     })
@@ -346,17 +342,13 @@ describe('main.ts', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error',
-        text: async () => 'Internal server error',
-        headers: new Map([['content-type', 'application/json']])
+        text: async () => 'Internal server error'
       })
 
       await run()
 
       expect(core.setFailed).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'Proxy error 500 Internal Server Error: Internal server error'
-        )
+        'Proxy error 500: Internal server error'
       )
     })
 

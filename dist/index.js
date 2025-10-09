@@ -31241,7 +31241,7 @@ function requireGithub () {
 
 var githubExports = requireGithub();
 
-const SKILLLENS_API_URL = 'https://skilllens-25qt.onrender.com/v1/recommendations';
+const SKILLLENS_API_URL = 'https://skill-lens-replit2142.replit.app/v1/recommendations';
 let debugEnabled = false;
 function debug(message) {
     if (debugEnabled) {
@@ -31388,27 +31388,19 @@ async function run() {
         debug(`Defaults: language=${defaults.language}, maxTopics=${defaults.maxTopics}, minConfidence=${defaults.minConfidence}`);
         debug(`Fail on proxy error: ${failOnProxyError}`);
         debug(`Calling SkillLens API with ${items.length} review item(s)`);
-        const requestBody = {
-            repo: { owner, name: repo, prNumber: pr },
-            reviews: items,
-            defaults
-        };
-        debug(`Request URL: ${SKILLLENS_API_URL}`);
-        debug(`Request Method: POST`);
-        debug(`Request Headers: Content-Type=application/json, Authorization=Bearer ${idToken.substring(0, 10)}...`);
-        debug(`Request Body: ${JSON.stringify(requestBody, null, 2)}`);
         let resp;
         try {
             resp = await fetch(SKILLLENS_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${idToken}`,
-                    'X-Requested-With': 'XMLHttpRequest',
-                    Referer: 'https://skill-lens-replit2142.replit.app/',
-                    Origin: 'https://skill-lens-replit2142.replit.app'
+                    Authorization: `Bearer ${idToken}`
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify({
+                    repo: { owner, name: repo, prNumber: pr },
+                    reviews: items,
+                    defaults
+                })
             });
         }
         catch (fetchError) {
@@ -31423,15 +31415,7 @@ async function run() {
         }
         debug(`API response status: ${resp.status}`);
         if (!resp.ok) {
-            const errorBody = await resp.text();
-            const errorDetails = {
-                status: resp.status,
-                statusText: resp.statusText,
-                body: errorBody,
-                headers: Object.fromEntries(resp.headers.entries())
-            };
-            const msg = `Proxy error ${resp.status} ${resp.statusText}: ${errorBody}\nFull response: ${JSON.stringify(errorDetails, null, 2)}`;
-            debug(`Full error response: ${JSON.stringify(errorDetails, null, 2)}`);
+            const msg = `Proxy error ${resp.status}: ${await resp.text()}`;
             if (failOnProxyError) {
                 coreExports.setFailed(msg);
                 return;
