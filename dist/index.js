@@ -31321,7 +31321,13 @@ async function upsertComment(octokit, owner, repo, pr, marker, markdown) {
         per_page: 100
     });
     const found = existing.data.find((c) => c.body?.includes(marker));
-    const fullBody = `${marker}\n\n${markdown}`;
+    // Add branded footer to the comment
+    const brandedMarkdown = `${markdown}
+
+---
+
+<sub>🤖 Powered by [SkillLens](https://github.com/hyperskill/skilllens-action) • AI-driven learning recommendations from PR feedback</sub>`;
+    const fullBody = `${marker}\n\n${brandedMarkdown}`;
     if (found) {
         coreExports.debug(`Updating existing comment (ID: ${found.id})`);
         await octokit.rest.issues.updateComment({

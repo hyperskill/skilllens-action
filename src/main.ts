@@ -116,7 +116,14 @@ export async function upsertComment(
   })
   const found = existing.data.find((c) => c.body?.includes(marker))
 
-  const fullBody = `${marker}\n\n${markdown}`
+  // Add branded footer to the comment
+  const brandedMarkdown = `${markdown}
+
+---
+
+<sub>🤖 Powered by [SkillLens](https://github.com/hyperskill/skilllens-action) • AI-driven learning recommendations from PR feedback</sub>`
+
+  const fullBody = `${marker}\n\n${brandedMarkdown}`
 
   if (found) {
     core.debug(`Updating existing comment (ID: ${found.id})`)

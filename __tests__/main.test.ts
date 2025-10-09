@@ -187,7 +187,7 @@ describe('main.ts', () => {
         owner: 'owner',
         repo: 'repo',
         comment_id: 456,
-        body: '<!-- marker -->\n\nnew content'
+        body: '<!-- marker -->\n\nnew content\n\n---\n\n<sub>🤖 Powered by [SkillLens](https://github.com/hyperskill/skilllens-action) • AI-driven learning recommendations from PR feedback</sub>'
       })
       expect(url).toBe('https://github.com/test/comment/456')
     })
