@@ -54,8 +54,6 @@ name: SkillLens Learning Recommendations
 on:
   pull_request_review:
     types: [submitted, edited]
-  pull_request_review_comment:
-    types: [created, edited]
   issue_comment:
     types: [created, edited]
 
@@ -67,7 +65,7 @@ concurrency:
   group:
     skilllens-${{ github.event.pull_request.number || github.event.issue.number
     }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   skilllens:
