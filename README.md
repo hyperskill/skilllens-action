@@ -49,6 +49,7 @@ projects supporting **contributor growth**, and developers seeking
 Add this workflow to `.github/workflows/skilllens.yml` in your repository:
 
 <!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD013 -->
 ```yaml
 name: SkillLens Learning Recommendations
 
@@ -77,6 +78,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+<!-- markdownlint-enable MD013 -->
 <!-- prettier-ignore-end -->
 
 **That's it!** 🎉 The action will now automatically post learning
