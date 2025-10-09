@@ -332,7 +332,7 @@ change this behavior by setting `fail-on-proxy-error: true`.
 
 **Error message:**
 
-```
+```text
 Error: Resource not accessible by integration
 ```
 
@@ -369,7 +369,7 @@ permissions.
 
 **Error message:**
 
-```
+```text
 Error message: Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable
 ```
 
