@@ -1,7 +1,7 @@
 name: 'SkillLens: PR Review Learning & Developer Growth'
 description:
-  'Transform PR review feedback into personalized learning paths with Hyperskill
-  courses. Automate skill gap analysis and developer education.'
+  'AI-powered GitHub Action that turns review comments into personalized
+  learning paths'
 author: 'Hyperskill / SkillLens'
 
 branding:
