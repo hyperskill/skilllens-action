@@ -48,6 +48,7 @@ projects supporting **contributor growth**, and developers seeking
 
 Add this workflow to `.github/workflows/skilllens.yml` in your repository:
 
+<!-- prettier-ignore-start -->
 ```yaml
 name: SkillLens Learning Recommendations
 
@@ -76,6 +77,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+<!-- prettier-ignore-end -->
 
 **That's it!** 🎉 The action will now automatically post learning
 recommendations when reviewers provide feedback.
