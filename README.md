@@ -60,9 +60,7 @@ on:
     types: [created, edited]
 
 permissions:
-  contents: read
-  pull-requests: read
-  issues: write
+  pull-requests: write
   id-token: write
 
 concurrency:
@@ -222,12 +220,14 @@ credentials
 
 ### Required Permissions
 
-| Permission      | Level | Purpose                           |
-| --------------- | ----- | --------------------------------- |
-| `contents`      | read  | Read repository metadata          |
-| `pull-requests` | read  | Fetch PR review comments          |
-| `issues`        | write | Create/update PR comments         |
-| `id-token`      | write | Request OIDC authentication token |
+| Permission      | Level | Purpose                                            |
+| --------------- | ----- | -------------------------------------------------- |
+| `pull-requests` | write | Read PR review comments and create/update comments |
+| `id-token`      | write | Request OIDC authentication token                  |
+
+> **Note:** The `pull-requests: write` permission typically covers both reading
+> PR data and writing comments. If you encounter permission issues, see the
+> [troubleshooting section](#-troubleshooting) for alternative configurations.
 
 ## 🎯 Use Cases
 
@@ -328,6 +328,24 @@ change this behavior by setting `fail-on-proxy-error: true`.
 <details>
 <summary><b>Common Issues and Solutions</b></summary>
 
+### "Permission denied" or "Resource not accessible by integration"
+
+**Cause:** Insufficient permissions for your repository settings
+
+**Solution:** If the minimal permissions don't work, try this expanded
+configuration:
+
+```yaml
+permissions:
+  contents: read # Repository metadata access
+  pull-requests: write # PR review and comment access
+  issues: read # Additional PR comment read access
+  id-token: write # OIDC authentication
+```
+
+Repository settings can vary, and some organizations may require additional
+permissions depending on their security policies.
+
 ### "Error requesting OIDC token"
 
 **Cause:** Missing `id-token: write` permission
@@ -337,8 +355,7 @@ change this behavior by setting `fail-on-proxy-error: true`.
 ```yaml
 permissions:
   id-token: write # Add this permission
-  pull-requests: read
-  issues: write
+  pull-requests: write
 ```
 
 ### "No comment appears after reviews"

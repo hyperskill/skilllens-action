@@ -126,14 +126,25 @@ Create `.env` file based on `.env.example` to simulate GitHub Actions environmen
 
 ## Permissions Required (for consumers)
 
-Action consumers must grant these permissions in their workflow:
+### Minimal Permissions (Recommended)
+Action consumers should use these simplified permissions in their workflow:
+```yaml
+permissions:
+  pull-requests: write    # Read PR reviews and create/update PR comments
+  id-token: write         # Request OIDC token
+```
+
+### Alternative Permissions
+If the minimal permissions don't work due to repository settings, try:
 ```yaml
 permissions:
   contents: read          # Read repo metadata
-  pull-requests: read     # Read PR reviews and comments
-  issues: write           # Create/update PR comments (PRs use Issues API)
+  pull-requests: write    # Read PR reviews and comments + write comments
+  issues: read            # Additional PR comment read access
   id-token: write         # Request OIDC token
 ```
+
+**Note**: The `pull-requests: write` permission typically provides all necessary access for reading PR data and creating comments, as PRs use the Issues API for comments.
 
 ## Versioning
 
@@ -186,7 +197,7 @@ permissions:
 1. **Forgetting to bundle**: After changing `src/`, must run `npm run bundle` and commit `dist/`
 2. **Reviewing dist/**: Don't review `dist/` changes in PRs — they mirror TypeScript sources
 3. **Using console**: Use `@actions/core` logging methods instead of `console.log`
-4. **Missing permissions**: Consumers need `id-token: write` for OIDC authentication
+4. **Missing permissions**: Consumers need `pull-requests: write` and `id-token: write` at minimum
 5. **Testing without mocks**: Mock GitHub API and proxy responses in tests
 
 ## Development Container
