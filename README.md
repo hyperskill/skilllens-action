@@ -328,35 +328,53 @@ change this behavior by setting `fail-on-proxy-error: true`.
 <details>
 <summary><b>Common Issues and Solutions</b></summary>
 
-### "Permission denied" or "Resource not accessible by integration"
+### "Resource not accessible by integration"
 
-**Cause:** Insufficient permissions for your repository settings
-
-**Solution:** If the minimal permissions don't work, try this expanded
-configuration:
-
-```yaml
-permissions:
-  contents: read # Repository metadata access
-  pull-requests: write # PR review and comment access
-  issues: read # Additional PR comment read access
-  id-token: write # OIDC authentication
+**Error message:**
+```
+Error: Resource not accessible by integration
 ```
 
-Repository settings can vary, and some organizations may require additional
-permissions depending on their security policies.
+**Cause:** Insufficient GitHub token permissions for accessing PR data or creating comments. This typically occurs when the workflow lacks proper permissions for the repository.
 
-### "Error requesting OIDC token"
-
-**Cause:** Missing `id-token: write` permission
-
-**Solution:**
+**Solution 1:** Ensure you have the minimal required permissions:
 
 ```yaml
 permissions:
-  id-token: write # Add this permission
   pull-requests: write
+  id-token: write
 ```
+
+**Solution 2:** If the minimal permissions don't work due to repository settings, try this expanded configuration:
+
+```yaml
+permissions:
+  contents: read      # Repository metadata access
+  pull-requests: write # PR review and comment access
+  issues: read        # Additional PR comment read access
+  id-token: write     # OIDC authentication
+```
+
+**Note:** Repository settings can vary, and some organizations may require additional permissions depending on their security policies. For organization-owned repositories, check that "Allow GitHub Actions to create and approve pull requests" is enabled in Settings → Actions → General → Workflow permissions.
+
+### "Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable"
+
+**Error message:**
+```
+Error message: Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable
+```
+
+**Cause:** Missing `id-token: write` permission. GitHub Actions only provides the OIDC token environment variables when this permission is explicitly granted.
+
+**Solution:** Add the `id-token: write` permission to your workflow:
+
+```yaml
+permissions:
+  pull-requests: write
+  id-token: write     # Required for OIDC authentication
+```
+
+Without `id-token: write`, the action cannot authenticate with the SkillLens backend and will fail immediately after fetching review data.
 
 ### "No comment appears after reviews"
 
