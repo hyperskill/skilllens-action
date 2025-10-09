@@ -63,15 +63,13 @@ permissions:
 
 concurrency:
   group:
-    skilllens-${{ github.event.pull_request.number || github.event.issue.number
-    }}
+    skilllens-${{ github.event.pull_request.number || github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
   skilllens:
     if:
-      ${{ github.event_name != 'issue_comment' ||
-      github.event.issue.pull_request }}
+      ${{ github.event_name != 'issue_comment' || github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
       - uses: hyperskill/skilllens-action@v1
