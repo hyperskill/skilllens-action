@@ -1,7 +1,7 @@
 {
   "name": "skilllens-action",
   "description": "GitHub Action: PR review feedback to personalized learning recommendations from Hyperskill",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Hyperskill <skilllens@hyperskill.org>",
   "type": "module",
   "private": true,
