@@ -1,0 +1,5 @@
+# Checkov configuration file
+# Exclude paths from scanning
+skip-path:
+  - node_modules
+  - dist
