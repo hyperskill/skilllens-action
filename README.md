@@ -255,14 +255,14 @@ needs and inform training priorities based on actual code review patterns.
 
 ## 🤝 Comparison with Alternatives
 
-| Feature              | Manual Learning Search | AI Code Reviewers    | SkillLens         |
-| -------------------- | ---------------------- | -------------------- | ----------------- |
-| **Automated**        | ❌ Manual effort       | ✅ Yes               | ✅ Yes            |
-| **Learning-Focused** | ⚠️ If you remember     | ❌ Code quality only | ✅ Primary focus  |
-| **Privacy**          | ✅ No tool needed      | ❌ Reads source code | ✅ Reviews only   |
-| **Setup Complexity** | N/A                    | 🔧 API keys required | ✅ Zero config    |
-| **Cost**             | Time-consuming         | 💰 Usually paid      | 🆓 Free           |
-| **Noise Level**      | N/A                    | 📢 Multiple comments | 🔇 Single comment |
+| Feature              | Manual Learning Search | AI Code Reviewers | SkillLens      |
+| -------------------- | ---------------------- | ----------------- | -------------- |
+| **Automated**        | No (Manual effort)     | Yes               | Yes            |
+| **Learning-Focused** | If you remember        | No (Code only)    | Yes (Primary)  |
+| **Privacy**          | Yes (No tool needed)   | No (Reads code)   | Yes (Reviews)  |
+| **Setup Complexity** | N/A                    | API keys required | Zero config    |
+| **Cost**             | Time-consuming         | Usually paid      | Free           |
+| **Noise Level**      | N/A                    | Multiple comments | Single comment |
 
 ## ❓ Frequently Asked Questions
 
